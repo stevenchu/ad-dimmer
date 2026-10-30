@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="580" viewBox="0 0 1200 580" role="img" aria-labelledby="title desc">
+<title id="title">Screen Cover: a manual picture cover for Android TV</title><desc id="desc">A dark TV screen with a small clear timer pill. Double-tap Volume Down to cover and optionally mute Sonos; double-tap or Back to return. Illustration, not a screenshot.</desc>
+<rect width="1200" height="580" rx="24" fill="#131a22"/>
+<g font-family="Arial,sans-serif" fill="#edf2f7"><text x="50" y="66" font-size="30" font-weight="bold">Screen Cover</text><text x="50" y="103" font-size="20" fill="#b7c5d4">A manual pause from the picture. The video keeps playing.</text></g>
+<rect x="50" y="145" width="740" height="360" rx="16" fill="#05080d" stroke="#3b4959" stroke-width="2"/>
+<path d="M51 420 L190 275 L320 380 L480 210 L788 420 L788 503 L51 503 Z" fill="#0e131b"/>
+<rect x="651" y="171" width="111" height="39" rx="19.5" fill="#38465b"/><text x="706" y="197" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" fill="#fff">Ad 1:23</text>
+<text x="420" y="470" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#8b99aa">Double-tap Volume − or Back to return</text>
+<g font-family="Arial,sans-serif"><text x="830" y="205" fill="#7dd3c7" font-size="19">DOUBLE-TAP VOLUME −</text><text x="830" y="242" fill="#fff" font-size="24">Cover the picture</text><text x="830" y="274" fill="#b7c5d4" font-size="18">Optional Sonos mute</text><text x="830" y="353" fill="#7dd3c7" font-size="19">DOUBLE-TAP OR BACK</text><text x="830" y="390" fill="#fff" font-size="24">Bring it back</text><text x="830" y="422" fill="#b7c5d4" font-size="18">Restore previous sound</text><text x="50" y="548" fill="#8b99aa" font-size="16">Illustration · No automatic ad detection · Experimental community tool</text></g>
+</svg>

@@ -1,0 +1,8 @@
+/build/
+*.jks
+*.keystore
+*.apk
+*.idsig
+local.properties
+.env*
+.DS_Store

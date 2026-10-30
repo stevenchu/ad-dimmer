@@ -1,0 +1,4 @@
+Signer #1 certificate DN: CN=Screen Cover Community, O=Steven Chu
+Signer #1 certificate SHA-256 digest: 5b16d5c80a885a954662ea98264ab0742c94650743dd4fa7f2763d066f497299
+Signer #1 certificate SHA-1 digest: f9524ce675614b53f78c2e829e23e0860cde390f
+Signer #1 certificate MD5 digest: 27b8d3c8b64d5915a9573248526898ca
