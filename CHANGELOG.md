@@ -23,3 +23,12 @@ First experimental community release, adapted from a personal Halo+ remote short
 - Optional user-configured Sonos mute with explicit state verification and restoration.
 - Audio disabled by default; no private device addresses bundled.
 - TV settings screen, installation/removal guide, source build script, validation tests, and compatibility-report template.
+
+## Unreleased — 0.3.0 shortcut setup draft
+
+- No fixed Volume Down shortcut; ordinary volume events pass through immediately.
+- Select or record a button; double, hold, and cautioned single replacement modes.
+- Adjustable double-press timing, default 650 ms.
+- Protected essential controls, settings bypass, restore-normal-buttons action.
+- Temporary 90-second tests with explicit confirmation and automatic rollback.
+- Native actions remain enabled for double/hold; those combinations require device-specific testing.

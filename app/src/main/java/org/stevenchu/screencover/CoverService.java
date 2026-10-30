@@ -142,17 +142,120 @@ public class CoverService extends AccessibilityService {
         || getPackageManager().getLaunchIntentForPackage(pkg) != null;
   }
 
-  private boolean pending = false, second = false, backUp = false;
-  private long first = 0, lastRepeat = 0;
-  private final Runnable single =
+  private ShortcutStore shortcutStore;
+  private ShortcutStore.Mapping active, trial;
+  private ShortcutGesture gesture;
+  private long trialEnds;
+  private boolean trialTriggered = false, recording = false;
+  private int recorded = -1;
+  private boolean backUp = false;
+  private final Runnable holdCheck =
       () -> {
-        pending = false;
-        lower();
+        if (gesture != null && gesture.tick(SystemClock.uptimeMillis())) fireShortcut();
       };
+  private final Runnable delayedToggle = () -> toggle();
+  private final Runnable expireTrial =
+      () -> {
+        hide();
+        trial = null;
+        loadShortcut();
+        toast("Shortcut test expired; previous mapping restored");
+      };
+
+  public void loadShortcut() {
+    h.removeCallbacks(holdCheck);
+    h.removeCallbacks(delayedToggle);
+    active = trial != null ? trial : shortcutStore.read();
+    if (!ShortcutPolicy.allowed(active.key, active.mode))
+      active = new ShortcutStore.Mapping(-1, "double", 650, 800);
+    gesture = new ShortcutGesture(active.mode, active.doubleMs, active.holdMs);
+  }
+
+  private void toast(String value) {
+    Toast.makeText(this, value, Toast.LENGTH_LONG).show();
+  }
+
+  public void startRecording() {
+    recorded = -1;
+    recording = true;
+    h.postDelayed(() -> recording = false, 20000);
+    toast("Press the button to use. Home, Back and navigation are protected.");
+  }
+
+  public int recordedKey() {
+    return recorded;
+  }
+
+  public boolean startTrial(ShortcutStore.Mapping candidate) {
+    if (!ShortcutPolicy.allowed(candidate.key, candidate.mode)) return false;
+    cancelTrial();
+    hide();
+    recording = false;
+    trial = candidate;
+    trialTriggered = false;
+    trialEnds = SystemClock.uptimeMillis() + 90000;
+    loadShortcut();
+    h.postDelayed(expireTrial, 90000);
+    return true;
+  }
+
+  public boolean trialActive() {
+    return trial != null && SystemClock.uptimeMillis() < trialEnds;
+  }
+
+  public boolean trialWorked() {
+    return trialActive() && trialTriggered;
+  }
+
+  public long trialSeconds() {
+    return Math.max(0, (trialEnds - SystemClock.uptimeMillis()) / 1000);
+  }
+
+  public boolean confirmTrial() {
+    if (!trialWorked() || cover != null) return false;
+    shortcutStore.save(trial);
+    trial = null;
+    h.removeCallbacks(expireTrial);
+    loadShortcut();
+    return true;
+  }
+
+  public void cancelTrial() {
+    h.removeCallbacks(expireTrial);
+    h.removeCallbacks(delayedToggle);
+    if (trial != null) {
+      hide();
+      trial = null;
+    }
+    if (shortcutStore != null) loadShortcut();
+  }
+
+  public void restoreNormalButtons() {
+    cancelTrial();
+    hide();
+    recording = false;
+    shortcutStore.disable();
+    loadShortcut();
+  }
+
+  private void fireShortcut() {
+    if (trial != null) {
+      if (!trialActive()) {
+        expireTrial.run();
+        return;
+      }
+      trialTriggered = true;
+    }
+    // Native double/hold actions run first; there is no interception delay on ordinary controls.
+    h.removeCallbacks(delayedToggle);
+    h.postDelayed(delayedToggle, active.mode.equals("single") ? 0 : 180);
+  }
 
   protected void onServiceConnected() {
     instance = this;
     presets = new PresetStore(this);
+    shortcutStore = new ShortcutStore(this);
+    loadShortcut();
     audio = (AudioManager) getSystemService(AUDIO_SERVICE);
     wm = (WindowManager) getSystemService(WINDOW_SERVICE);
     Log.i("ScreenCover", "connected");
@@ -163,65 +266,52 @@ public class CoverService extends AccessibilityService {
     }
   }
 
-  private void lower() {
-    audio.adjustStreamVolume(
-        AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-  }
-
-  private void flush() {
-    if (pending) {
-      h.removeCallbacks(single);
-      pending = false;
-      lower();
-    }
-  }
-
   protected boolean onKeyEvent(KeyEvent e) {
-    int k = e.getKeyCode();
+    int key = e.getKeyCode();
     boolean down = e.getAction() == KeyEvent.ACTION_DOWN;
-    if (k == KeyEvent.KEYCODE_BACK && (cover != null || backUp)) {
+    if (down && (key == KeyEvent.KEYCODE_BACK || key == KeyEvent.KEYCODE_HOME)) {
+      h.removeCallbacks(delayedToggle);
+      h.removeCallbacks(holdCheck);
+    }
+    if (key == KeyEvent.KEYCODE_BACK && (cover != null || backUp)) {
       if (down) {
         hide();
         backUp = true;
       } else backUp = false;
       return true;
     }
-    if (k == KeyEvent.KEYCODE_VOLUME_UP && down && cover != null) hide();
-    if (k != KeyEvent.KEYCODE_VOLUME_DOWN) {
-      if (down) flush();
+    if (key == KeyEvent.KEYCODE_VOLUME_UP && down && cover != null) hide();
+    // Recording is observational: essential buttons and native single actions remain available.
+    if (recording && !down && ShortcutPolicy.allowed(key, "double")) {
+      recorded = key;
+      recording = false;
+      toast("Recorded " + KeyEvent.keyCodeToString(key));
       return false;
     }
-    if (down) {
-      if (e.getRepeatCount() > 0) {
-        if (second) return true;
-        if (pending) {
-          flush();
-          lastRepeat = SystemClock.uptimeMillis();
-          return true;
-        }
-        if (SystemClock.uptimeMillis() - lastRepeat > 110) {
-          lower();
-          lastRepeat = SystemClock.uptimeMillis();
-        }
-        return true;
+    if (recording) return false;
+    // Settings and navigation must always remain operable, except during an explicit temporary
+    // test.
+    if (!trialActive() && (MainActivity.visible || ShortcutActivity.visible)) return false;
+    if (active == null || key != active.key) {
+      if (down && gesture != null) {
+        gesture.reset();
+        h.removeCallbacks(holdCheck);
       }
-
-      if (pending && SystemClock.uptimeMillis() - first <= 300) {
-        h.removeCallbacks(single);
-        pending = false;
-        second = true;
-        toggle();
-      } else {
-        flush();
-        second = false;
-        pending = true;
-        first = SystemClock.uptimeMillis();
-        h.postDelayed(single, 300);
+      return false;
+    }
+    long now = SystemClock.uptimeMillis();
+    if (down) {
+      gesture.down(now, e.getRepeatCount());
+      if (e.getRepeatCount() == 0) {
+        h.removeCallbacks(holdCheck);
+        h.postDelayed(holdCheck, active.holdMs);
       }
     } else {
-      if (second) second = false;
+      h.removeCallbacks(holdCheck);
+      if (gesture.up(now)) fireShortcut();
     }
-    return true;
+    // Double and hold never swallow native events. Single replacement requires a confirmed test.
+    return active.mode.equals("single");
   }
 
   private void toggle() {
@@ -253,8 +343,7 @@ public class CoverService extends AccessibilityService {
             paint.setColor(Color.argb(110, 220, 225, 230));
             paint.setTextSize(18 * getResources().getDisplayMetrics().density);
             paint.setTextAlign(Paint.Align.CENTER);
-            c.drawText(
-                "Double-tap Volume − or Back to return", getWidth() / 2f, getHeight() - 45, paint);
+            c.drawText("Press Back to return", getWidth() / 2f, getHeight() - 45, paint);
           }
         };
     WindowManager.LayoutParams p =
@@ -308,6 +397,7 @@ public class CoverService extends AccessibilityService {
   public void onDestroy() {
     instance = null;
     h.removeCallbacksAndMessages(null);
+    trial = null;
     hide();
     super.onDestroy();
   }

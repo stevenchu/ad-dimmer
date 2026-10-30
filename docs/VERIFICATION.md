@@ -1,5 +1,11 @@
 # What has been verified
 
+## v0.3.0 draft — configurable shortcuts
+
+Local foundation only; community release pending physical-remote testing. Shortcut timing and protected-key unit tests pass. Double/hold leave native events untouched; unlike the old fixed Volume Down handler, they do not delay ordinary volume. See [shortcut behavior and caveats](SHORTCUTS.md).
+
+The default community mapping is unassigned. Real Menu/Input/Mute behavior still needs explicit testing on each remote.
+
 ## v0.2.0 — preset foundation
 
 On the same Android 11 Halo+ and Arc Ultra setup, a separate QA build verified:
@@ -49,3 +55,9 @@ The original local version was used with a physical Bluetooth remote and Prime V
 - Exact timer fit on different layouts, video aspect ratios, and resolutions.
 
 No claim of universal compatibility, automatic ad recognition, live blur, or guaranteed playback continuation is made.
+
+### Shortcut draft device checks
+
+A separate QA build exercised the service directly: unassigned Volume Down events pass through; protected Home mapping is rejected; confirmation fails until the gesture is detected and the cover removed; cancel restores the previous mapping; process restart discards a trial; accelerated timeout restores the prior mapping; and Restore normal remote buttons deletes the assignment. The production trial uses 90 seconds; QA shortened only the timer to 15 seconds. Settings/warnings were visually inspected on the TV.
+
+Direct diagnostic events do not prove that the physical Menu key is exposed by the projector or that its ordinary menu action is compatible with double-press dimming. The personal build is installed for that physical test, with no permanent mapping saved by installation. Community publication remains held pending the user's result.

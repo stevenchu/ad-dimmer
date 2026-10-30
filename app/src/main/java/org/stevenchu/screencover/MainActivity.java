@@ -9,6 +9,20 @@ import android.widget.*;
 
 /** Native widgets keep the settings usable with a TV D-pad. */
 public class MainActivity extends Activity {
+  public static boolean visible;
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    visible = true;
+  }
+
+  @Override
+  protected void onPause() {
+    visible = false;
+    super.onPause();
+  }
+
   private LinearLayout form;
   private SharedPreferences prefs;
   private EditText opacity, left, top, width, height, host;
@@ -31,10 +45,24 @@ public class MainActivity extends Activity {
     scroll.addView(form);
     text("Ad Dimmer", 30);
     text(
-        "Double-tap Volume Down to dim the picture. Double-tap again, Back, or Volume Up to return."
-            + " Single presses and holds still lower volume, with a 300 ms initial delay. This is a"
-            + " manual cover; ads keep playing.",
+        "Press your chosen shortcut to dim. Back always uncovers. Volume keys run normally, without"
+            + " an interception delay. Configure and test a shortcut below; none is assigned by"
+            + " default.",
         20);
+    button(
+        "Choose / test remote shortcut",
+        () -> {
+          startActivity(new Intent(this, ShortcutActivity.class));
+          return true;
+        });
+    button(
+        "Restore normal remote buttons",
+        () -> {
+          new ShortcutStore(this).disable();
+          if (CoverService.instance != null) CoverService.instance.restoreNormalButtons();
+          toast("Ad Dimmer shortcuts disabled. Native buttons restored.");
+          return true;
+        });
     text(
         "Optional Sonos audio: cover mutes; uncover restores the previous mute state. Other"
             + " speakers are not controlled. Network errors show a message; the picture can still"

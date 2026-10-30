@@ -2,7 +2,9 @@
 
 **Dim ad breaks with your Android TV remote.**
 
-Double-tap **Volume Down** to darken the picture. Keep the ad countdown visible, then double-tap again—or press **Back**—to return.
+Choose a remote shortcut to darken the picture. Keep the ad countdown visible, then use the shortcut again—or press **Back**—to return.
+
+**Shortcut setup changes are currently a local v0.3.0 draft. The downloadable v0.2.1 still uses fixed double-tap Volume Down.**
 
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes. **Tested on Android 11 with Prime Video; other setups need testers.**
 
@@ -17,7 +19,7 @@ Free and open source. Made for Android TV devices, including TVs, projectors, an
 1. **Install the app** on your Android TV device. [Need help?](docs/SETUP.md)
 2. **Open Ad Dimmer** from your Apps list. Choose how dark the picture should be and adjust the timer opening.
 3. **Enable Ad Dimmer remote shortcut** in Android's Accessibility settings.
-4. Return to your video and **double-tap Volume Down** to try it.
+4. For the v0.3.0 draft, open **Choose / test remote shortcut** and complete its temporary test. The current download uses double-tap Volume Down.
 
 No paid app, account, root, or firmware change required. Disable other remote-button remappers to avoid conflicts.
 
@@ -25,10 +27,12 @@ No paid app, account, root, or firmware change required. Disable other remote-bu
 
 | Remote button | What happens |
 | --- | --- |
-| Double-tap Volume Down | Dim / restore the picture |
+| Your confirmed shortcut (draft v0.3.0) | Dim / restore the picture |
 | Back while dimmed | Restore the picture |
 | Volume Up while dimmed | Restore the picture and raise volume |
-| Tap or hold Volume Down | Lower volume, with a short initial delay |
+| Tap or hold Volume Down (draft v0.3.0 default) | Normal immediate volume control |
+
+[Shortcut safety and recovery](docs/SHORTCUTS.md) explains temporary tests and what happens to normal button actions.
 
 ## Make it yours
 
