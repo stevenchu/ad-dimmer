@@ -6,7 +6,7 @@ Choose a remote shortcut to darken the picture. Keep the ad countdown visible, t
 
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes. **Tested on Android 11 with Prime Video; other setups need testers.**
 
-**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.3.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
+**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.3.1/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
 ![Before and after an illustrative 95% ad dimmer, with the countdown visible](docs/ad-dimmer-demo.png)
 
@@ -15,9 +15,9 @@ Free and open source. Made for Android TV devices, including TVs, projectors, an
 ## Set it up
 
 1. **Install the app** on your Android TV device. [Need help?](docs/SETUP.md)
-2. **Open Ad Dimmer** from your Apps list. Choose how dark the picture should be and adjust the timer opening.
+2. **Open Ad Dimmer** from your Apps list. Use **Picture** to set darkness and **Advanced** to adjust the timer opening.
 3. **Enable Ad Dimmer remote shortcut** in Android's Accessibility settings.
-4. Open **Choose / test remote shortcut**, try a 90-second temporary mapping, then confirm it works. Nothing is assigned until you choose it.
+4. Under **Shortcut**, open **Change shortcut**, try a 90-second temporary mapping, then confirm it works. Nothing is assigned until you choose it.
 
 No paid app, account, root, or firmware change required. Disable other remote-button remappers to avoid conflicts.
 

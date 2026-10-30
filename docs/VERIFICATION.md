@@ -1,5 +1,15 @@
 # What has been verified
 
+## v0.3.1 — simpler settings
+
+The personal build was installed on the Android 11 projector. Native D-pad focus and the Shortcut/Picture screens were inspected on-device. A separate QA build exercised save/discard navigation, picture persistence, audio-address validation, geometry validation, and conditional single-press warnings. Existing configuration, preset, and shortcut tests pass. The saved Menu shortcut and 95% Prime preset were preserved. This update does not add a new physical-remote compatibility claim.
+
+![Settings](settings-v031.png)
+
+![Shortcut options](shortcut-v031.png)
+
+![Picture options](picture-v031.png)
+
 ## v0.3.0 — configurable shortcuts
 
 The personal build was installed and its saved Menu mapping confirmed. The user reported that double-press Menu works on the physical remote in the Prime Video setup. Shortcut timing and protected-key unit tests pass. Double/hold leave native events untouched; unlike the old fixed Volume Down handler, they do not delay ordinary volume. See [shortcut behavior and caveats](SHORTCUTS.md).
@@ -58,6 +68,6 @@ No claim of universal compatibility, automatic ad recognition, live blur, or gua
 
 ### Shortcut draft device checks
 
-A separate QA build exercised the service directly: unassigned Volume Down events pass through; protected Home mapping is rejected; confirmation fails until the gesture is detected and the cover removed; cancel restores the previous mapping; process restart discards a trial; accelerated timeout restores the prior mapping; and Restore normal remote buttons deletes the assignment. The production trial uses 90 seconds; QA shortened only the timer to 15 seconds. Settings/warnings were visually inspected on the TV.
+A separate QA build exercised the service directly: unassigned Volume Down events pass through; protected Home mapping is rejected; confirmation fails until the gesture is detected and the cover removed; cancel restores the previous mapping; process restart discards a trial; accelerated timeout restores the prior mapping; and Disable shortcut deletes the assignment. The production trial uses 90 seconds; QA shortened only the timer to 15 seconds. Settings/warnings were visually inspected on the TV.
 
 Direct diagnostic events do not prove that the physical Menu key is exposed by the projector or that its ordinary menu action is compatible with double-press dimming. Installation itself saves no permanent mapping. After the temporary test, the user saved Menu in the setup screen and confirmed double-press Menu works. A final device read showed Prime Video active, cover off, no trial running, and saved key 82 (Menu). Volume forwarding was checked in the diagnostic path; the user has not separately reported the feel of volume holds after this update.

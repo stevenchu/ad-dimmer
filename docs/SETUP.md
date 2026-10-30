@@ -10,25 +10,22 @@ If your TV cannot open APK files, use the computer method below. A Google Play a
 
 Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
 
-- **Preset to edit:** Default or Prime Video initially. Visual edits apply to the selected preset. Audio remains global.
-- **Automatic app selection:** use the saved layout for the detected app, or Default if none exists. Turn off to always use the preset selected above.
-- **Add an app preset:** advanced users can enter an Android package ID and name. This copies Default; it does not certify support. See [presets](PRESETS.md).
-- **Opacity:** 95 means a 95% opaque black cover; 100 is completely opaque.
-- **Timer opening:** leave it on for a pill-shaped clear area; turn it off for a full cover.
-- **Left / Top / Width / Height:** pixels relative to a 1920 × 1080 reference screen. They scale with the display. Smaller Left moves it left; smaller Top moves it up. The opening must fit on the reference screen.
-- **Sonos:** leave off for visual cover only. To also mute, enter the private IPv4 address of the soundbar playing your TV audio, then enable the option. Find its address in the Sonos app's system information or your router's device list. A router address reservation helps keep it stable. This version does not discover speakers automatically.
+- **Shortcut:** choose and test your remote button.
+- **Picture:** choose a preset, darkness, and whether to keep the ad timer visible. Choose **Save picture**.
+- **Sound:** optionally enable Sonos mute and enter your speaker address. Choose **Save sound**.
+- **Advanced:** move or resize the timer opening, or add an app preset. Positions use a 1920 × 1080 reference and scale with your display.
 
-Save settings. Sonos control uses local HTTP on port 1400 and supports private IPv4 addresses only. Do not forward this port through your router.
+Visual settings belong to each preset; sound settings apply to all presets. Automatic selection uses the detected app's saved preset, or Default. Other streaming apps still need testing.
 
 ## Enable the service and choose a shortcut
 
-The typical path on Android TV is **Settings → Device Preferences → Accessibility → Ad Dimmer remote shortcut → Enable**. The app also has an Open Accessibility settings button; some XGIMI firmware opens the general settings screen instead, so navigate there manually.
+The typical path on Android TV is **Settings → Device Preferences → Accessibility → Ad Dimmer remote shortcut → Enable**. The app also has an Enable remote controls button; some XGIMI firmware opens the general settings screen instead, so navigate there manually.
 
 Read Android's permission notice. This service is for intercepting remote buttons and displaying the cover. It does not request screen-content retrieval. Only enable apps you trust.
 
 Disable other remote key-filtering services, such as Button Mapper, before enabling this one. On newer Android versions a sideloaded app's Accessibility access may be restricted; follow the device's own instructions if it offers “Allow restricted settings.” If it does not, report the model and version rather than bypassing device security.
 
-After enabling the service, open **Ad Dimmer → Choose / test remote shortcut**. Pick a button and trigger, then start a temporary test. For single press, read the replacement warning and confirm another route to the original function. Try the gesture, uncover, and return to confirm before 90 seconds expires. Otherwise the previous mapping returns. See [shortcut safety](SHORTCUTS.md).
+After enabling the service, open **Ad Dimmer → Shortcut → Change shortcut**. Pick a button and trigger, then start a temporary test. For single press, read the replacement warning and confirm another route to the original function. Try the gesture, uncover, and return to confirm before 90 seconds expires. Otherwise the previous mapping returns. See [shortcut safety](SHORTCUTS.md).
 
 ## First test
 
@@ -66,7 +63,7 @@ If sound stays muted, unmute directly in the Sonos app. Reconnecting Ad Dimmer's
 ## Problems
 
 - **Double-tap does nothing:** check Accessibility is still enabled and another key-filtering service is not competing.
-- **Single taps feel slower:** the 300 ms wait distinguishes a tap from a double-tap.
+- **Ordinary button actions also happen:** double-press and hold observe the button without delaying its normal action. Try another button if this interferes.
 - **Sound does not mute:** check Sonos is enabled, the correct soundbar address is saved, and both devices can reach each other. Wi-Fi guest isolation can block local control.
 - **Picture returns but no sound:** use Sonos to unmute; report the sequence and any error message.
 - **Timer opening is wrong:** adjust its geometry; the app does not recognize the timer automatically.

@@ -285,7 +285,7 @@ public class CoverService extends AccessibilityService {
     if (recording && !down && ShortcutPolicy.allowed(key, "double")) {
       recorded = key;
       recording = false;
-      toast("Recorded " + KeyEvent.keyCodeToString(key));
+      toast("Recorded " + RemoteLabels.button(key));
       return false;
     }
     if (recording) return false;

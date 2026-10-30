@@ -2,14 +2,14 @@
 
 v0.3.0 shortcut foundation. Double-press Menu was confirmed on the original Android 11 Halo+ / Prime Video setup. Other button/remote combinations require their own temporary test.
 
-Open **Ad Dimmer → Choose / test remote shortcut** from Android TV's Apps list. No shortcut is assigned by default, including when upgrading from the old fixed Volume Down mapping. Volume Down and Volume Up run immediately unless you explicitly assign a supported gesture to Volume Down.
+Open **Ad Dimmer → Shortcut → Change shortcut** from Android TV's Apps list. No shortcut is assigned by default, including when upgrading from the old fixed Volume Down mapping. Volume Down and Volume Up run immediately unless you explicitly assign a supported gesture to Volume Down.
 
 ## Choose and test
 
-1. Choose Menu, Mute, Input, Volume Down (advanced), or **Record another remote button**. Recording observes one button without swallowing its native action; that action may open another screen. Return to Ad Dimmer to see the recorded key.
+1. Choose Menu, Mute, Input, Volume Down (advanced), or **Another button**, then **Record button**. Recording observes one button without swallowing its native action; that action may open another screen. Return to Ad Dimmer to see the recorded key.
 2. Choose double press, hold, or single press. Double press defaults to a more forgiving **650 ms** and can be adjusted from 250–1200 ms. Hold is 800 ms.
 3. Read the behavior below. Start a **90-second temporary test**.
-4. Open your video app and physically try the shortcut. Uncover with Back. Return through Home → Apps → Ad Dimmer → shortcut setup and choose **It worked — save this shortcut** before time runs out.
+4. Open your video app and physically try the shortcut. Uncover with Back. Return through Home → Apps → Ad Dimmer → shortcut setup and choose **Keep this shortcut** before time runs out.
 5. If you do nothing, the previous confirmed mapping returns. A crash or process restart also discards the trial. The app refuses confirmation until the gesture has actually been observed and the cover removed.
 
 ## What happens to the button's ordinary action?
@@ -23,7 +23,7 @@ Home, Back, Power, D-pad navigation/OK, Enter, Volume Up, voice-assistant, and o
 ## Recovery
 
 - **Back** removes a cover; **Home** remains native.
-- Open Ad Dimmer from Apps and choose **Restore normal remote buttons**. This cancels any trial, removes the cover, restores requested audio state, and deletes the shortcut assignment.
+- Open Ad Dimmer from Apps and choose **Disable shortcut**. This cancels any trial, removes the cover, restores requested audio state, and deletes the shortcut assignment.
 - Or disable Ad Dimmer's Accessibility service in Android settings.
 - Sonos can always be unmuted directly in its app.
 

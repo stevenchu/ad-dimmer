@@ -2,19 +2,21 @@ package org.stevenchu.screencover;
 
 import android.app.*;
 import android.os.*;
-import android.view.KeyEvent;
+import android.view.*;
 import android.widget.*;
 
 /**
- * Recovery-first setup: a trial is temporary, and only a gesture actually observed can be saved.
+ * Compact setup; replacement cautions and rollback remain part of the actual test, not fine print.
  */
 public class ShortcutActivity extends Activity {
   public static boolean visible;
+  private TvUi ui;
   private Spinner keyChoice, modeChoice;
   private EditText gap;
-  private TextView status;
+  private TextView status, behavior;
   private CheckBox alternateAccess;
-  private Button confirm;
+  private Button confirm, cancel, test, record;
+  private LinearLayout timing, trialHelp;
   private int captured = -1;
   private final Handler handler = new Handler(Looper.getMainLooper());
   private final Runnable refresh =
@@ -32,139 +34,173 @@ public class ShortcutActivity extends Activity {
   @Override
   public void onCreate(Bundle saved) {
     super.onCreate(saved);
-    LinearLayout content = new LinearLayout(this);
-    content.setOrientation(1);
-    content.setPadding(48, 24, 48, 48);
-    ScrollView scroll = new ScrollView(this);
-    scroll.addView(content);
-    label(content, "Ad Dimmer shortcut", 28);
-    label(
-        content,
-        "Home, Back, navigation, Power, and Volume Up are protected. Back always uncovers. Open Ad"
-            + " Dimmer from Apps to change or disable your shortcut.",
-        18);
-    status = new TextView(this);
-    status.setTextSize(20);
+    ui = new TvUi(this);
+    LinearLayout root = ui.page("Shortcut", "Home and Back always remain available.");
+    LinearLayout content = ui.column();
+    root.addView(ui.scroll(content), new LinearLayout.LayoutParams(-1, 0, 1));
+    status = ui.text("", 20, true);
     content.addView(status);
-    Button reset = new Button(this);
-    reset.setText("Restore normal remote buttons");
-    content.addView(reset);
-    reset.setOnClickListener(
-        v -> {
-          new ShortcutStore(this).disable();
-          if (service() != null) service().restoreNormalButtons();
-          update();
-        });
-    label(content, "Choose a button", 20);
-    keyChoice = new Spinner(this);
-    keyChoice.setAdapter(
-        new ArrayAdapter<String>(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            new String[] {
-              "Menu (☰)", "Mute", "Input", "Volume Down (advanced)", "Recorded button"
-            }));
-    content.addView(keyChoice);
-    Button record = new Button(this);
-    record.setText("Record another remote button");
-    content.addView(record);
-    record.setOnClickListener(
-        v -> {
-          if (service() == null) {
-            message("Enable the Ad Dimmer Accessibility service first");
-            return;
-          }
-          captured = -1;
-          keyChoice.setSelection(4);
-          service().startRecording();
-        });
-    label(content, "Trigger", 20);
-    modeChoice = new Spinner(this);
-    modeChoice.setAdapter(
-        new ArrayAdapter<String>(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            new String[] {
-              "Double press (native actions also run)",
-              "Hold (native action also runs)",
-              "Single press (replaces normal action)"
-            }));
-    content.addView(modeChoice);
-    label(content, "Double-press window in milliseconds (250–1200)", 18);
-    gap = new EditText(this);
-    gap.setSingleLine(true);
-    gap.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-    gap.setText("650");
-    content.addView(gap);
-    label(
-        content,
-        "For double press and hold, normal button actions are immediate. A menu may open, or Mute"
-            + " may change sound, before dimming. Choose another button if that interferes. Hold is"
-            + " 800 ms. Volume Down is never delayed; avoid assigning it if accidental dimming is a"
-            + " concern.",
-        18);
-    alternateAccess = new CheckBox(this);
-    alternateAccess.setText(
-        "For single press: I know another way to open the original function, using Home / Apps or"
-            + " another button.");
+    ui.gap(content, 8);
+    LinearLayout selectors = ui.row();
+    LinearLayout first = ui.column(), second = ui.column();
+    LinearLayout.LayoutParams half = new LinearLayout.LayoutParams(0, -2, 1);
+    half.rightMargin = ui.dp(16);
+    selectors.addView(first, half);
+    selectors.addView(second, new LinearLayout.LayoutParams(0, -2, 1));
+    content.addView(selectors);
+    ui.label(first, "Button");
+    keyChoice = ui.spinner("Menu (☰)", "Mute", "Input", "Volume Down", "Another button");
+    first.addView(keyChoice);
+    ui.label(second, "Press type");
+    modeChoice = ui.spinner("Double press", "Hold", "Single press — replaces original");
+    second.addView(modeChoice);
+    ShortcutStore.Mapping savedMapping = new ShortcutStore(this).read();
+    if (savedMapping.key >= 0) {
+      int pos = -1;
+      int[] keys = {82, 164, 178, 25};
+      for (int i = 0; i < keys.length; i++) if (keys[i] == savedMapping.key) pos = i;
+      if (pos < 0) {
+        captured = savedMapping.key;
+        pos = 4;
+      }
+      keyChoice.setSelection(pos);
+      modeChoice.setSelection(
+          savedMapping.mode.equals("hold") ? 1 : savedMapping.mode.equals("single") ? 2 : 0);
+    }
+    record =
+        ui.button(
+            "Record button",
+            false,
+            () -> {
+              if (service() == null) {
+                message("Enable remote controls first");
+                return;
+              }
+              captured = -1;
+              keyChoice.setSelection(4);
+              service().startRecording();
+            });
+    ui.addButton(content, record);
+    timing = ui.row();
+    TextView timingLabel = ui.text("Time between presses", 17, false);
+    timingLabel.setPadding(0, 0, ui.dp(20), 0);
+    timing.addView(timingLabel, new LinearLayout.LayoutParams(-2, -2));
+    gap = ui.input("" + savedMapping.doubleMs, true);
+    timing.addView(gap, new LinearLayout.LayoutParams(ui.dp(110), -2));
+    TextView ms = ui.text("  ms", 16, false);
+    timing.addView(ms);
+    content.addView(timing);
+    behavior = ui.text("", 16, false);
+    content.addView(behavior);
+    alternateAccess = ui.check("I can reach the original function another way", false);
     content.addView(alternateAccess);
-    Button test = new Button(this);
-    test.setText("Start a 90-second temporary test");
-    content.addView(test);
-    test.setOnClickListener(v -> startTest());
-    label(
+    android.widget.AdapterView.OnItemSelectedListener changed =
+        new android.widget.AdapterView.OnItemSelectedListener() {
+          public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
+            updateBehavior();
+          }
+
+          public void onNothingSelected(AdapterView<?> p) {}
+        };
+    keyChoice.setOnItemSelectedListener(changed);
+    modeChoice.setOnItemSelectedListener(changed);
+    LinearLayout actions = ui.row();
+    test = ui.button("Test shortcut", true, this::startTest);
+    Button video = ui.button("Open Prime Video", false, this::openPrime);
+    LinearLayout.LayoutParams actionHalf = new LinearLayout.LayoutParams(0, ui.dp(52), 1);
+    actionHalf.rightMargin = ui.dp(12);
+    actions.addView(test, actionHalf);
+    actions.addView(video, new LinearLayout.LayoutParams(0, ui.dp(52), 1));
+    ui.gap(content, 8);
+    content.addView(actions);
+    trialHelp = ui.column();
+    ui.note(
+        trialHelp,
+        "Try the shortcut in your video app. Uncover, then return here to save it. Unconfirmed"
+            + " tests revert after 90 seconds.");
+    content.addView(trialHelp);
+    confirm =
+        ui.button(
+            "Keep this shortcut",
+            true,
+            () -> {
+              if (service() != null && service().confirmTrial()) message("Shortcut saved");
+              else message("Try the shortcut, uncover, then confirm before time runs out");
+              update();
+            });
+    ui.addButton(content, confirm);
+    cancel =
+        ui.button(
+            "Cancel test",
+            false,
+            () -> {
+              if (service() != null) service().cancelTrial();
+              update();
+            });
+    ui.addButton(content, cancel);
+    ui.addButton(
         content,
-        "Try the shortcut, uncover with Back, then return here using Home → Apps → Ad Dimmer →"
-            + " Choose / test remote shortcut. Confirm before the test expires. If you do nothing,"
-            + " it reverts. No shortcut is saved until confirmation.",
-        18);
-    Button prime = new Button(this);
-    prime.setText("Open Prime Video to test");
-    content.addView(prime);
-    prime.setOnClickListener(
-        v -> {
-          android.content.Intent intent =
-              getPackageManager().getLeanbackLaunchIntentForPackage(AppPresetPolicy.PRIME);
-          if (intent == null)
-            intent = getPackageManager().getLaunchIntentForPackage(AppPresetPolicy.PRIME);
-          if (intent != null) startActivity(intent);
-          else message("Prime Video is not available; use Home to open your video app.");
-        });
-    confirm = new Button(this);
-    confirm.setText("It worked — save this shortcut");
-    content.addView(confirm);
-    confirm.setOnClickListener(
-        v -> {
-          if (service() != null && service().confirmTrial()) message("Shortcut saved");
-          else message("Trigger the shortcut, uncover, then confirm before the test expires");
-          update();
-        });
-    Button cancel = new Button(this);
-    cancel.setText("Cancel test / keep previous shortcut");
-    content.addView(cancel);
-    cancel.setOnClickListener(
-        v -> {
-          if (service() != null) service().cancelTrial();
-          update();
-        });
-    setContentView(scroll);
+        ui.button(
+            "How testing works",
+            false,
+            () ->
+                new AlertDialog.Builder(this)
+                    .setTitle("A safe way to try a button")
+                    .setMessage(
+                        "Start a temporary test, open your video app, and try the shortcut. Back"
+                            + " uncovers. Return through Home → Apps → Ad Dimmer → Change shortcut,"
+                            + " then keep it before the 90-second timer ends. Otherwise the"
+                            + " previous shortcut returns.\n\n"
+                            + "Double press and hold also run the button's ordinary actions. A menu"
+                            + " may appear or Mute may change sound first. Try another button if"
+                            + " that interferes.\n\n"
+                            + "Hold is 800 ms. Double-press timing can be 250–1200 ms; 650 ms gives"
+                            + " you more time than a rapid double-click.")
+                    .setPositiveButton("Got it", null)
+                    .show()));
+    ui.addButton(
+        content,
+        ui.button(
+            "Disable shortcut",
+            false,
+            () ->
+                new AlertDialog.Builder(this)
+                    .setTitle("Disable the dimmer shortcut?")
+                    .setNegativeButton("Keep shortcut", null)
+                    .setPositiveButton(
+                        "Disable shortcut",
+                        (d, w) -> {
+                          new ShortcutStore(this).disable();
+                          if (service() != null) service().restoreNormalButtons();
+                          update();
+                        })
+                    .show()));
+    setContentView(root);
+    updateBehavior();
+    update();
+    test.requestFocus();
   }
 
-  private void label(LinearLayout parent, String text, int size) {
-    TextView t = new TextView(this);
-    t.setText(text);
-    t.setTextSize(size);
-    t.setPadding(0, 10, 0, 10);
-    parent.addView(t);
+  private void updateBehavior() {
+    if (behavior == null) return;
+    boolean single = modeChoice.getSelectedItemPosition() == 2;
+    record.setVisibility(keyChoice.getSelectedItemPosition() == 4 ? View.VISIBLE : View.GONE);
+    timing.setVisibility(modeChoice.getSelectedItemPosition() == 0 ? View.VISIBLE : View.GONE);
+    alternateAccess.setVisibility(single ? View.VISIBLE : View.GONE);
+    String button = keyChoice.getSelectedItem().toString();
+    behavior.setText(
+        single
+            ? "Replaces ordinary " + button + ". Keep another way to access it."
+            : "The button’s usual action may also run. Test before saving.");
   }
 
-  private void message(String text) {
-    Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+  private void message(String value) {
+    Toast.makeText(this, value, Toast.LENGTH_LONG).show();
   }
 
   private void startTest() {
     if (service() == null) {
-      message("Enable Ad Dimmer in Accessibility first");
+      message("Enable remote controls in Android Accessibility first");
       return;
     }
     int key = new int[] {82, 164, 178, 25, captured}[keyChoice.getSelectedItemPosition()];
@@ -173,40 +209,46 @@ public class ShortcutActivity extends Activity {
     try {
       window = Integer.parseInt(gap.getText().toString());
     } catch (Exception e) {
-      message("Enter a timing value from 250 to 1200");
+      message("Use a timing value from 250 to 1200 ms");
       return;
     }
     if (window < 250 || window > 1200) {
-      message("Choose a timing value from 250 to 1200");
+      message("Choose 250–1200 ms");
       return;
     }
     if (!ShortcutPolicy.allowed(key, mode)) {
-      message("That button/trigger is protected or no button has been recorded");
+      message("Choose or record a supported button");
       return;
     }
     Runnable apply =
         () -> {
           service().startTrial(new ShortcutStore.Mapping(key, mode, window, 800));
           update();
-          message("Temporary test started; expires in 90 seconds unless confirmed");
+          message("Test started — 90 seconds to try and keep it");
         };
     if (mode.equals("single")) {
       if (!alternateAccess.isChecked()) {
-        message("Confirm another way to reach the button's original function first");
+        message("Confirm another route to the original function first");
         return;
       }
       new AlertDialog.Builder(this)
-          .setTitle("Replace this button's normal action?")
+          .setTitle("Replace ordinary " + RemoteLabels.button(key) + "?")
           .setMessage(
-              "Single press of "
-                  + KeyEvent.keyCodeToString(key)
-                  + " will dim instead of its original action. This may replace Settings, Input, or"
-                  + " ordinary Mute. Home and Back remain protected. Test expires after 90"
-                  + " seconds.")
+              "This button will dim instead of its normal action. Home and Back remain available."
+                  + " The test reverts after 90 seconds unless you keep it.")
           .setNegativeButton("Cancel", null)
           .setPositiveButton("Test temporarily", (d, w) -> apply.run())
           .show();
     } else apply.run();
+  }
+
+  private void openPrime() {
+    android.content.Intent intent =
+        getPackageManager().getLeanbackLaunchIntentForPackage(AppPresetPolicy.PRIME);
+    if (intent == null)
+      intent = getPackageManager().getLaunchIntentForPackage(AppPresetPolicy.PRIME);
+    if (intent != null) startActivity(intent);
+    else message("Use Home to open your video app");
   }
 
   private void update() {
@@ -214,22 +256,21 @@ public class ShortcutActivity extends Activity {
     CoverService s = service();
     if (s != null && s.recordedKey() > 0) captured = s.recordedKey();
     ShortcutStore.Mapping m = new ShortcutStore(this).read();
-    String value =
-        "Saved: "
-            + (m.key < 0
-                ? "none — native buttons unchanged"
-                : m.mode + " " + KeyEvent.keyCodeToString(m.key));
-    if (captured > 0) value += "\nRecorded: " + KeyEvent.keyCodeToString(captured);
-    if (s != null && s.trialActive())
-      value +=
-          "\nTemporary test: "
+    boolean trial = s != null && s.trialActive();
+    String label = RemoteLabels.shortcut(m.key, m.mode);
+    if (trial)
+      label =
+          "Test · "
               + s.trialSeconds()
-              + " seconds left. "
-              + (s.trialWorked()
-                  ? "Gesture detected; uncover and confirm."
-                  : "Try your chosen gesture.");
-    status.setText(value);
-    confirm.setEnabled(s != null && s.trialWorked() && !s.isCovered());
+              + "s left · "
+              + (s.trialWorked() ? "Shortcut detected" : "Try your gesture");
+    else if (captured > 0 && keyChoice.getSelectedItemPosition() == 4)
+      label = "Recorded: " + RemoteLabels.button(captured);
+    status.setText(label);
+    confirm.setVisibility(trial ? View.VISIBLE : View.GONE);
+    confirm.setEnabled(trial && s.trialWorked() && !s.isCovered());
+    cancel.setVisibility(trial ? View.VISIBLE : View.GONE);
+    trialHelp.setVisibility(trial ? View.VISIBLE : View.GONE);
   }
 
   @Override
@@ -237,12 +278,13 @@ public class ShortcutActivity extends Activity {
     super.onResume();
     visible = true;
     handler.post(refresh);
-    confirm.postDelayed(
-        () -> {
-          if (service() != null && service().trialWorked() && !service().isCovered())
-            confirm.requestFocus();
-        },
-        250);
+    if (confirm != null)
+      confirm.postDelayed(
+          () -> {
+            if (service() != null && service().trialWorked() && !service().isCovered())
+              confirm.requestFocus();
+          },
+          250);
   }
 
   @Override
