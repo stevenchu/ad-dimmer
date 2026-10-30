@@ -10,7 +10,11 @@ With an optional Sonos connection, covering the picture also mutes your soundbar
 
 [Download the early release](https://github.com/stevenchu/screen-cover/releases/tag/v0.2.0) · [Setup guide](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/screen-cover/issues)
 
-![Illustration of Screen Cover and the remote controls](docs/overview.svg)
+![Direct projector screenshot during a Prime Video ad break with the dimmer active and countdown visible](docs/prime-ad-dimmer.png)
+
+*Actual Prime Video ad break captured from the projector with the dimmer active. The protected video layer appears black in direct screenshots; this image does not demonstrate the faint picture visible through the 95% cover on the physical projection.*
+
+[View the illustrated controls overview](docs/overview.svg)
 
 ## What you can do
 
