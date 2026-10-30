@@ -1,14 +1,14 @@
-# Set up Screen Cover
+# Set up Ad Dimmer
 
 ## Install
 
-Download `ScreenCover.apk` from the project's GitHub release onto your Android TV device. Use a file-transfer app or USB drive and open it with a file manager. Android may ask you to allow that file manager to install unknown apps. Turn that permission back off afterward if you no longer need it.
+Download `AdDimmer.apk` from the project's GitHub release onto your Android TV device. Use a file-transfer app or USB drive and open it with a file manager. Android may ask you to allow that file manager to install unknown apps. Turn that permission back off afterward if you no longer need it.
 
 If your TV cannot open APK files, use the computer method below. A Google Play account, paid Button Mapper upgrade, root, and a new projector OS are not required.
 
 ## Choose your settings
 
-Open Screen Cover from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
+Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
 
 - **Preset to edit:** Default or Prime Video initially. Visual edits apply to the selected preset. Audio remains global.
 - **Automatic app selection:** use the saved layout for the detected app, or Default if none exists. Turn off to always use the preset selected above.
@@ -22,7 +22,7 @@ Save settings. Sonos control uses local HTTP on port 1400 and supports private I
 
 ## Enable the remote shortcut
 
-The typical path on Android TV is **Settings → Device Preferences → Accessibility → Screen Cover remote shortcut → Enable**. The app also has an Open Accessibility settings button; some XGIMI firmware opens the general settings screen instead, so navigate there manually.
+The typical path on Android TV is **Settings → Device Preferences → Accessibility → Ad Dimmer remote shortcut → Enable**. The app also has an Open Accessibility settings button; some XGIMI firmware opens the general settings screen instead, so navigate there manually.
 
 Read Android's permission notice. This service is for intercepting remote buttons and displaying the cover. It does not request screen-content retrieval. Only enable apps you trust.
 
@@ -50,16 +50,16 @@ Once connected and authorized:
 
 ```sh
 adb devices
-adb -s YOUR_DEVICE install --no-incremental -r ScreenCover.apk
+adb -s YOUR_DEVICE install --no-incremental -r AdDimmer.apk
 ```
 
 Replace `YOUR_DEVICE` with the exact authorized entry shown by `adb devices`. For a TV that already exposes network debugging, connect with `adb connect YOUR_TV_IP:PORT`. For firmware that offers pairing, use its displayed pairing and connection ports with `adb pair` and `adb connect`.
 
 ## Stop or remove
 
-Uncover first, then disable **Screen Cover remote shortcut** in Accessibility. Uninstall Screen Cover from Apps if you want to remove it. You can then re-enable your old button remapper.
+Uncover first, then disable **Ad Dimmer remote shortcut** in Accessibility. Uninstall Ad Dimmer from Apps if you want to remove it. You can then re-enable your old button remapper.
 
-If sound stays muted, unmute directly in the Sonos app. Reconnecting Screen Cover's service also attempts to restore a saved mute state. Do not reset the projector or flash firmware to remove this app.
+If sound stays muted, unmute directly in the Sonos app. Reconnecting Ad Dimmer's service also attempts to restore a saved mute state. Do not reset the projector or flash firmware to remove this app.
 
 ## Problems
 

@@ -9,7 +9,7 @@ bash scripts/test.sh
 bash scripts/build.sh
 ```
 
-You can override `ANDROID_BUILD_TOOLS` and `ANDROID_PLATFORM_JAR` for a nonstandard SDK layout. Output: `build/ScreenCover.apk` and `build/SHA256SUMS`. The script compiles Java, converts it to DEX, packages resources, aligns, signs, and verifies the APK.
+You can override `ANDROID_BUILD_TOOLS` and `ANDROID_PLATFORM_JAR` for a nonstandard SDK layout. Output: `build/AdDimmer.apk` and `build/SHA256SUMS`. The script compiles Java, converts it to DEX, packages resources, aligns, signs, and verifies the APK.
 
 ## Signing
 

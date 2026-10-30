@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-30
+
+- Renamed the project and app display name to Ad Dimmer; internal app ID and signing identity stay unchanged for upgrades.
+- Shortened the README around downloading, installing, and using the remote.
+- Added a clearly labeled fictional before/after illustration and retained the authentic capture separately.
+
 ## 0.2.0 — 2026-10-29
 
 - Automatic app-identity-based visual presets, with Prime Video as the initial identity.

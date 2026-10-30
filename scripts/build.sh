@@ -28,9 +28,9 @@ export SCREEN_COVER_STORE_PASS="${SCREEN_COVER_STORE_PASS:-android}"
 ALIAS="${SCREEN_COVER_KEY_ALIAS:-screen-cover}"
 if [[ ! -f "$KEYSTORE" ]]; then
   if [[ -n "${SCREEN_COVER_KEYSTORE:-}" ]]; then echo 'Release keystore does not exist.' >&2; exit 1; fi
-  keytool -genkeypair -keystore "$KEYSTORE" -storepass:env SCREEN_COVER_STORE_PASS -keypass:env SCREEN_COVER_STORE_PASS -alias "$ALIAS" -dname 'CN=Screen Cover Development' -keyalg RSA -validity 3650
+  keytool -genkeypair -keystore "$KEYSTORE" -storepass:env SCREEN_COVER_STORE_PASS -keypass:env SCREEN_COVER_STORE_PASS -alias "$ALIAS" -dname 'CN=Ad Dimmer Development' -keyalg RSA -validity 3650
 fi
-"$BT/apksigner" sign --ks "$KEYSTORE" --ks-key-alias "$ALIAS" --ks-pass env:SCREEN_COVER_STORE_PASS --out "$OUT/ScreenCover.apk" "$OUT/aligned.apk"
-"$BT/apksigner" verify --verbose "$OUT/ScreenCover.apk"
-python3 "$ROOT/scripts/checksum.py" "$OUT/ScreenCover.apk" > "$OUT/SHA256SUMS"
-echo "Built $OUT/ScreenCover.apk"
+"$BT/apksigner" sign --ks "$KEYSTORE" --ks-key-alias "$ALIAS" --ks-pass env:SCREEN_COVER_STORE_PASS --out "$OUT/AdDimmer.apk" "$OUT/aligned.apk"
+"$BT/apksigner" verify --verbose "$OUT/AdDimmer.apk"
+python3 "$ROOT/scripts/checksum.py" "$OUT/AdDimmer.apk" > "$OUT/SHA256SUMS"
+echo "Built $OUT/AdDimmer.apk"

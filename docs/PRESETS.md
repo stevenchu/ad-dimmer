@@ -4,7 +4,7 @@ The cover is still manually toggled. Automatic selection changes **which saved v
 
 ## User flow
 
-Open Screen Cover from Android TV's Apps list. Choose **Preset to edit**, adjust opacity and timer geometry, and save. Automatic app selection is on by default. Turn it off to always use the preset selected in the editor.
+Open Ad Dimmer from Android TV's Apps list. Choose **Preset to edit**, adjust opacity and timer geometry, and save. Automatic app selection is on by default. Turn it off to always use the preset selected in the editor.
 
 Prime Video is the only bundled app identity: `com.amazon.amazonvideo.livingroom`. Its initial layout copies your previous settings. Default handles everything without a saved profile. Audio settings are global, so changing video apps cannot redirect mute to another soundbar.
 

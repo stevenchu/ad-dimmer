@@ -1,6 +1,6 @@
 # Privacy
 
-Screen Cover has no accounts, developer backend, analytics, advertisements, or third-party app SDKs.
+Ad Dimmer has no accounts, developer backend, analytics, advertisements, or third-party app SDKs.
 
 - Accessibility receives remote key events and window-state notifications with the source app identifier to select a preset. Current app identity stays in memory; no viewing or app-use history is saved. The app does not retrieve window content, inspect video, recognize ads, or read text on screen.
 - Settings and a pending audio-restoration record are stored in private app preferences. Cloud backup is disabled.

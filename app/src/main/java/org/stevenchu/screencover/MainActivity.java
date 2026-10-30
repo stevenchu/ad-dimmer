@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
     form.setOrientation(LinearLayout.VERTICAL);
     form.setPadding(48, 32, 48, 48);
     scroll.addView(form);
-    text("Screen Cover", 30);
+    text("Ad Dimmer", 30);
     text(
         "Double-tap Volume Down to dim the picture. Double-tap again, Back, or Volume Up to return."
             + " Single presses and holds still lower volume, with a 300 ms initial delay. This is a"
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
         "Try cover (Back returns)",
         () -> {
           if (!save()) return false;
-          if (CoverService.instance == null) toast("Enable Screen Cover in Accessibility first");
+          if (CoverService.instance == null) toast("Enable Ad Dimmer in Accessibility first");
           else CoverService.instance.preview();
           return true;
         });
@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
         "Privacy: Accessibility reads button events, not screen content. No analytics, accounts,"
             + " ads, microphone, or video recording. Network requests are used only for optional"
             + " local Sonos mute control. Enable only one remote-button filtering service at a"
-            + " time. Disable Screen Cover in Accessibility to stop it.",
+            + " time. Disable Ad Dimmer in Accessibility to stop it.",
         18);
     setContentView(scroll);
   }
