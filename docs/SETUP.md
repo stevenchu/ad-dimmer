@@ -10,6 +10,9 @@ If your TV cannot open APK files, use the computer method below. A Google Play a
 
 Open Screen Cover from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
 
+- **Preset to edit:** Default or Prime Video initially. Visual edits apply to the selected preset. Audio remains global.
+- **Automatic app selection:** use the saved layout for the detected app, or Default if none exists. Turn off to always use the preset selected above.
+- **Add an app preset:** advanced users can enter an Android package ID and name. This copies Default; it does not certify support. See [presets](PRESETS.md).
 - **Opacity:** 95 means a 95% opaque black cover; 100 is completely opaque.
 - **Timer opening:** leave it on for a pill-shaped clear area; turn it off for a full cover.
 - **Left / Top / Width / Height:** pixels relative to a 1920 × 1080 reference screen. They scale with the display. Smaller Left moves it left; smaller Top moves it up. The opening must fit on the reference screen.

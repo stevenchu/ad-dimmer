@@ -12,12 +12,18 @@ public class MainActivity extends Activity {
   private LinearLayout form;
   private SharedPreferences prefs;
   private EditText opacity, left, top, width, height, host;
-  private CheckBox timer, sonos;
+  private CheckBox timer, sonos, automatic;
+  private PresetStore presets;
+  private Spinner presetChoice;
+  private java.util.List<String> presetIds;
+  private String editing = AppPresetPolicy.DEFAULT;
+  private EditText appId, appName;
 
   @Override
   public void onCreate(Bundle state) {
     super.onCreate(state);
     prefs = getSharedPreferences("settings", 0);
+    presets = new PresetStore(this);
     ScrollView scroll = new ScrollView(this);
     form = new LinearLayout(this);
     form.setOrientation(LinearLayout.VERTICAL);
@@ -34,6 +40,20 @@ public class MainActivity extends Activity {
             + " speakers are not controlled. Network errors show a message; the picture can still"
             + " be covered.",
         18);
+    String detected = CoverService.instance == null ? "" : CoverService.instance.detectedApp();
+    text(
+        "Detected app: "
+            + (detected.isEmpty()
+                ? "not yet identified — return to your video app"
+                : presets.name(detected)),
+        18);
+    text("Preset to edit", 20);
+    presetChoice = new Spinner(this);
+    form.addView(presetChoice);
+    automatic =
+        check(
+            "Automatic app selection (otherwise use the preset selected above)", "automatic", true);
+    automatic.setChecked(presets.automatic());
     opacity = number("Cover opacity (%)", "opacity", 95);
     timer = check("Leave a pill-shaped opening for the ad timer", "timer", true);
     text("Timer position (1920 × 1080 reference pixels; scaled for your display)", 20);
@@ -53,6 +73,47 @@ public class MainActivity extends Activity {
     host.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
     host.setText(prefs.getString("host", ""));
     form.addView(host);
+    refreshChoices();
+    presetChoice.setOnItemSelectedListener(
+        new android.widget.AdapterView.OnItemSelectedListener() {
+          public void onItemSelected(
+              android.widget.AdapterView<?> parent, android.view.View view, int pos, long id) {
+            editing = presetIds.get(pos);
+            loadVisual();
+          }
+
+          public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+    text("Add an app preset (advanced)", 20);
+    text(
+        "Enter its Android package ID and a friendly name. This copies Default; it is not a tested"
+            + " layout. Save edits before switching presets.",
+        18);
+    appId = new EditText(this);
+    appId.setSingleLine(true);
+    appId.setHint("Android package ID");
+    form.addView(appId);
+    appName = new EditText(this);
+    appName.setSingleLine(true);
+    appName.setHint("Preset name");
+    form.addView(appName);
+    button(
+        "Add app preset",
+        () -> {
+          String id = appId.getText().toString().trim();
+          if (!id.matches("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")) {
+            toast("Enter a valid Android package ID");
+            return false;
+          }
+          if (presets.apps().contains(id)) {
+            toast("That preset already exists");
+            return false;
+          }
+          presets.add(id, appName.getText().toString().trim());
+          refreshChoices();
+          presetChoice.setSelection(presetIds.indexOf(id));
+          return true;
+        });
     button("Save settings", this::save);
     button(
         "Try cover (Back returns)",
@@ -75,6 +136,32 @@ public class MainActivity extends Activity {
             + " time. Disable Screen Cover in Accessibility to stop it.",
         18);
     setContentView(scroll);
+  }
+
+  private void refreshChoices() {
+    presetIds = new java.util.ArrayList<>();
+    presetIds.add(AppPresetPolicy.DEFAULT);
+    java.util.List<String> ids = new java.util.ArrayList<>(presets.apps());
+    java.util.Collections.sort(ids);
+    presetIds.addAll(ids);
+    java.util.List<String> labels = new java.util.ArrayList<>();
+    for (String id : presetIds) labels.add(presets.name(id));
+    presetChoice.setAdapter(
+        new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, labels));
+    int pos = presetIds.indexOf(presets.manual());
+    presetChoice.setSelection(Math.max(0, pos));
+    editing = presetIds.get(Math.max(0, pos));
+    loadVisual();
+  }
+
+  private void loadVisual() {
+    PresetStore.Visual v = presets.read(editing);
+    opacity.setText("" + v.opacity);
+    left.setText("" + v.left);
+    top.setText("" + v.top);
+    width.setText("" + v.width);
+    height.setText("" + v.height);
+    timer.setChecked(v.timer);
   }
 
   private void text(String value, int size) {
@@ -143,17 +230,9 @@ public class MainActivity extends Activity {
         toast("Uncover the screen before changing settings.");
         return false;
       }
-      prefs
-          .edit()
-          .putInt("opacity", a)
-          .putInt("left", l)
-          .putInt("top", t)
-          .putInt("width", w)
-          .putInt("height", h)
-          .putString("host", ip)
-          .putBoolean("timer", timer.isChecked())
-          .putBoolean("sonos", sonos.isChecked())
-          .apply();
+      presets.save(
+          editing, new PresetStore.Visual(a, l, t, w, h, timer.isChecked()), automatic.isChecked());
+      prefs.edit().putString("host", ip).putBoolean("sonos", sonos.isChecked()).apply();
       toast("Settings saved");
       return true;
     } catch (NumberFormatException error) {

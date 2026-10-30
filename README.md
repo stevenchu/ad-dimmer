@@ -8,7 +8,7 @@ With an optional Sonos connection, covering the picture also mutes your soundbar
 
 **This is manually triggered. It does not detect, skip, shorten, or block ads.** Video is intended to keep playing underneath the cover. There is no timer that automatically brings the picture back.
 
-[Download the early release](https://github.com/stevenchu/screen-cover/releases/tag/v0.1.0) · [Setup guide](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/screen-cover/issues)
+[Download the early release](https://github.com/stevenchu/screen-cover/releases/tag/v0.2.0) · [Setup guide](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/screen-cover/issues)
 
 ![Illustration of Screen Cover and the remote controls](docs/overview.svg)
 
@@ -23,12 +23,13 @@ With an optional Sonos connection, covering the picture also mutes your soundbar
 
 - Choose how dark the cover is; the default is **95% opacity**.
 - Move and resize the rounded timer opening, or turn it off.
+- Save a visual preset per app, with automatic selection or a manual override. Prime is the initial identity; other layouts need testers.
 - Optionally mute a **Sonos home-theater soundbar** over your home network.
 - Use it without a soundbar connection for a visual cover only.
 
 ## Start here
 
-1. Download `ScreenCover.apk` from [Releases](https://github.com/stevenchu/screen-cover/releases/tag/v0.1.0) and install it on your Android TV device. It is not a Play Store app.
+1. Download `ScreenCover.apk` from [Releases](https://github.com/stevenchu/screen-cover/releases/tag/v0.2.0) and install it on your Android TV device. It is not a Play Store app.
 2. Open **Screen Cover** and review the settings. Audio control is off until you configure it.
 3. Enable **Screen Cover remote shortcut** under Android's Accessibility settings. Disable other services that remap the same remote buttons.
 4. Play a video and test cover / uncover, volume control, and sound before relying on it.
@@ -39,7 +40,7 @@ See the [step-by-step setup and removal guide](docs/SETUP.md), including ADB ins
 
 This started as a personal tool for an **original XGIMI Halo+ (2023), Android 11, Bluetooth remote, Prime Video, and Sonos Arc Ultra over HDMI ARC**. The original prototype's remote gesture, visual cover, and direct Sonos mute were exercised on that setup. The community version makes those settings editable.
 
-**v0.1.0 is an early experimental release.** Android 8.0+ is the build minimum, not a promise of compatibility. Other TVs, projectors, apps, remotes, Sonos models, and newer Android restrictions need community testing. Check [verification notes](docs/VERIFICATION.md) for exactly what was tested.
+**v0.2.0 is an early experimental release.** Android 8.0+ is the build minimum, not a promise of compatibility. Other TVs, projectors, apps, remotes, Sonos models, and newer Android restrictions need community testing. Check [verification notes](docs/VERIFICATION.md) for exactly what was tested.
 
 ## Limits worth knowing
 
@@ -62,5 +63,7 @@ Optional network access sends local Sonos `GetMute` / `SetMute` commands to the 
 The source is plain Java with Android's built-in widgets and APIs; there are no third-party app libraries. Start with [BUILDING.md](BUILDING.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Useful contributions include compatibility reports, better TV setup flows, timer calibration controls, remote-gesture tests, and reliable speaker discovery. Please keep automatic ad detection separate from claims about the manual cover that exists today.
+
+The [preset architecture](docs/PRESETS.md) explains where to contribute. Use the [QA checklist](docs/QA.md) to report actual device and app coverage.
 
 MIT licensed. Independent community project; not affiliated with XGIMI, Amazon, Google, or Sonos.

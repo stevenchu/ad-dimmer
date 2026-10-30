@@ -1,5 +1,19 @@
 # What has been verified
 
+## v0.2.0 — preset foundation
+
+On the same Android 11 Halo+ and Arc Ultra setup, a separate QA build verified:
+
+- An actual Prime Video window event selects the Prime preset.
+- Own/system event filtering preserves the Prime identity.
+- Switching to Android TV Settings while covered removes the cover and restores the prior Sonos mute state.
+- A synthetic custom app's 55% preset remains separate from Prime's 95% preset.
+- Manual selection and return to automatic selection resolve the intended profile.
+- Saved custom/Prime presets survive process and service restart.
+- Unit tests cover ignored/null/duplicate events, unknown-app fallback, custom selection, manual override, and invalid configuration boundaries.
+
+The custom identifier was simulated. No additional streaming service is certified by those tests. The updated personal build is for a Prime Video pilot; the physical-remote/ad-playback and full-device-reboot checklist in [QA.md](QA.md) still requires user validation.
+
 ## v0.1.0 — October 29, 2026
 
 Test device: original XGIMI Halo+ (2023), Android 11/API 30, 1920 × 1080 output. Audio: Sonos Arc Ultra on the home network, connected to the projector through HDMI ARC.

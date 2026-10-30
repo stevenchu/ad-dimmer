@@ -117,6 +117,31 @@ public class CoverService extends AccessibilityService {
   private AudioManager audio;
   private WindowManager wm;
   private View cover;
+  private final AppPresetPolicy appPolicy = new AppPresetPolicy();
+  private PresetStore presets;
+  private String pendingPackage;
+  private final Runnable confirmPackage =
+      () -> {
+        if (appPolicy.observe(pendingPackage, true, getPackageName()) && cover != null) hide();
+      };
+
+  public String detectedApp() {
+    return appPolicy.currentApp();
+  }
+
+  public String selectedPreset() {
+    return appPolicy.select(presets.automatic(), presets.manual(), presets.apps());
+  }
+
+  private boolean confirmedApp(String pkg) {
+    if (pkg == null || pkg.equals(getPackageName())) return false;
+    if (pkg.equals("com.android.tv.settings")) return true;
+    if (presets.apps().contains(pkg)) return true;
+    // Query only launchable TV/mobile apps, not window text. Volume/IME overlays are not apps here.
+    return getPackageManager().getLeanbackLaunchIntentForPackage(pkg) != null
+        || getPackageManager().getLaunchIntentForPackage(pkg) != null;
+  }
+
   private boolean pending = false, second = false, backUp = false;
   private long first = 0, lastRepeat = 0;
   private final Runnable single =
@@ -127,6 +152,7 @@ public class CoverService extends AccessibilityService {
 
   protected void onServiceConnected() {
     instance = this;
+    presets = new PresetStore(this);
     audio = (AudioManager) getSystemService(AUDIO_SERVICE);
     wm = (WindowManager) getSystemService(WINDOW_SERVICE);
     Log.i("ScreenCover", "connected");
@@ -204,32 +230,24 @@ public class CoverService extends AccessibilityService {
   }
 
   private void show() {
+    // Freeze this immutable visual snapshot until uncovered; system popups cannot change it.
+    String selected = selectedPreset();
+    final PresetStore.Visual visual = presets.read(selected);
     View v =
         new View(this) {
           protected void onDraw(Canvas c) {
             super.onDraw(c);
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(
-                Color.argb(
-                    Math.round(
-                        getSharedPreferences("settings", 0).getInt("opacity", 95) * 255f / 100f),
-                    0,
-                    0,
-                    0));
+            paint.setColor(Color.argb(Math.round(visual.opacity * 255f / 100f), 0, 0, 0));
             // Reference geometry is in 1920 x 1080 pixels and scales to the display.
-            android.content.SharedPreferences cfg = getSharedPreferences("settings", 0);
+
             float sx = getWidth() / 1920f, sy = getHeight() / 1080f;
-            float left = cfg.getInt("left", 1685) * sx, top = cfg.getInt("top", 72) * sy;
-            RectF timer =
-                new RectF(
-                    left,
-                    top,
-                    left + cfg.getInt("width", 140) * sx,
-                    top + cfg.getInt("height", 56) * sy);
+            float left = visual.left * sx, top = visual.top * sy;
+            RectF timer = new RectF(left, top, left + visual.width * sx, top + visual.height * sy);
             Path mask = new Path();
             mask.setFillType(Path.FillType.EVEN_ODD);
             mask.addRect(0, 0, getWidth(), getHeight(), Path.Direction.CW);
-            if (cfg.getBoolean("timer", true))
+            if (visual.timer)
               mask.addRoundRect(timer, timer.height() / 2f, timer.height() / 2f, Path.Direction.CW);
             c.drawPath(mask, paint);
             paint.setColor(Color.argb(110, 220, 225, 230));
@@ -272,7 +290,16 @@ public class CoverService extends AccessibilityService {
     }
   }
 
-  public void onAccessibilityEvent(AccessibilityEvent e) {}
+  public void onAccessibilityEvent(AccessibilityEvent e) {
+    if (presets == null || e.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
+    CharSequence source = e.getPackageName();
+    String pkg = source == null ? null : source.toString();
+    if (!confirmedApp(pkg)) return;
+    // Debounce launch transitions. Ignore our own cover, keyboard, and transient system windows.
+    pendingPackage = pkg;
+    h.removeCallbacks(confirmPackage);
+    h.postDelayed(confirmPackage, 200);
+  }
 
   public void onInterrupt() {
     hide();
