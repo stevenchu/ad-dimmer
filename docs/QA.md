@@ -17,7 +17,7 @@ Synthetic app identifiers exercise the policy and storage. They do not establish
 | --- | --- |
 | Open Prime and play content | Prime preset selected after returning from Ad Dimmer settings |
 | During an actual ad, double-tap Volume Down | Correct 95% cover/cutout appears; sound mutes if configured; ad continues |
-| Double-tap again | Picture returns and original sound state is restored |
+| Use the shortcut again | Picture returns and original sound state is restored |
 | Repeat; use Back to uncover | Restores picture/sound without navigating away from playback |
 | Tap / hold Volume Down normally | Lowers sound; holding does not toggle the cover |
 | Change volume to show its panel, then double-tap | Prime profile still used |

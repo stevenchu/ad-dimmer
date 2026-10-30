@@ -24,7 +24,7 @@ First experimental community release, adapted from a personal Halo+ remote short
 - Audio disabled by default; no private device addresses bundled.
 - TV settings screen, installation/removal guide, source build script, validation tests, and compatibility-report template.
 
-## Unreleased — 0.3.0 shortcut setup draft
+## 0.3.0 — 2026-10-30
 
 - No fixed Volume Down shortcut; ordinary volume events pass through immediately.
 - Select or record a button; double, hold, and cautioned single replacement modes.

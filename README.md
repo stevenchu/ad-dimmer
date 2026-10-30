@@ -4,11 +4,9 @@
 
 Choose a remote shortcut to darken the picture. Keep the ad countdown visible, then use the shortcut again—or press **Back**—to return.
 
-**Shortcut setup changes are currently a local v0.3.0 draft. The downloadable v0.2.1 still uses fixed double-tap Volume Down.**
-
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes. **Tested on Android 11 with Prime Video; other setups need testers.**
 
-**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.2.1/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
+**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.3.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
 ![Before and after an illustrative 95% ad dimmer, with the countdown visible](docs/ad-dimmer-demo.png)
 
@@ -19,18 +17,20 @@ Free and open source. Made for Android TV devices, including TVs, projectors, an
 1. **Install the app** on your Android TV device. [Need help?](docs/SETUP.md)
 2. **Open Ad Dimmer** from your Apps list. Choose how dark the picture should be and adjust the timer opening.
 3. **Enable Ad Dimmer remote shortcut** in Android's Accessibility settings.
-4. For the v0.3.0 draft, open **Choose / test remote shortcut** and complete its temporary test. The current download uses double-tap Volume Down.
+4. Open **Choose / test remote shortcut**, try a 90-second temporary mapping, then confirm it works. Nothing is assigned until you choose it.
 
 No paid app, account, root, or firmware change required. Disable other remote-button remappers to avoid conflicts.
+
+Normal volume control is immediate. Single-press replacement shows a warning; Home, Back, and essential navigation are protected.
 
 ## Your controls
 
 | Remote button | What happens |
 | --- | --- |
-| Your confirmed shortcut (draft v0.3.0) | Dim / restore the picture |
+| Your confirmed shortcut | Dim / restore the picture |
 | Back while dimmed | Restore the picture |
 | Volume Up while dimmed | Restore the picture and raise volume |
-| Tap or hold Volume Down (draft v0.3.0 default) | Normal immediate volume control |
+| Tap or hold Volume Down (default) | Normal immediate volume control |
 
 [Shortcut safety and recovery](docs/SHORTCUTS.md) explains temporary tests and what happens to normal button actions.
 

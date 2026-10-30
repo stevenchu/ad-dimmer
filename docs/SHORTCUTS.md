@@ -1,6 +1,6 @@
 # Choose a shortcut without losing normal remote controls
 
-Draft v0.3.0 foundation. Community release is held for physical-remote testing.
+v0.3.0 shortcut foundation. Double-press Menu was confirmed on the original Android 11 Halo+ / Prime Video setup. Other button/remote combinations require their own temporary test.
 
 Open **Ad Dimmer → Choose / test remote shortcut** from Android TV's Apps list. No shortcut is assigned by default, including when upgrading from the old fixed Volume Down mapping. Volume Down and Volume Up run immediately unless you explicitly assign a supported gesture to Volume Down.
 

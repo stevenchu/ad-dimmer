@@ -20,7 +20,7 @@ Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the
 
 Save settings. Sonos control uses local HTTP on port 1400 and supports private IPv4 addresses only. Do not forward this port through your router.
 
-## Enable the remote shortcut
+## Enable the service and choose a shortcut
 
 The typical path on Android TV is **Settings → Device Preferences → Accessibility → Ad Dimmer remote shortcut → Enable**. The app also has an Open Accessibility settings button; some XGIMI firmware opens the general settings screen instead, so navigate there manually.
 
@@ -28,13 +28,15 @@ Read Android's permission notice. This service is for intercepting remote button
 
 Disable other remote key-filtering services, such as Button Mapper, before enabling this one. On newer Android versions a sideloaded app's Accessibility access may be restricted; follow the device's own instructions if it offers “Allow restricted settings.” If it does not, report the model and version rather than bypassing device security.
 
+After enabling the service, open **Ad Dimmer → Choose / test remote shortcut**. Pick a button and trigger, then start a temporary test. For single press, read the replacement warning and confirm another route to the original function. Try the gesture, uncover, and return to confirm before 90 seconds expires. Otherwise the previous mapping returns. See [shortcut safety](SHORTCUTS.md).
+
 ## First test
 
 1. Play something at a comfortable volume.
-2. Double-tap Volume Down quickly. The picture should dim.
+2. Use your chosen shortcut. The picture should dim.
 3. If Sonos is enabled, confirm sound stops.
 4. Press Back. Picture and prior sound state should return, without navigating away from the video.
-5. Repeat using double-tap to uncover. Test a single Volume Down tap, a hold, and Volume Up.
+5. Repeat using your shortcut to uncover. Test a single Volume Down tap, a hold, and Volume Up.
 6. During an actual ad, fit the timer opening. If it misses the timer, uncover and adjust settings.
 7. Repeat after restarting the device; Accessibility-service persistence varies by firmware.
 
