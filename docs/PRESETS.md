@@ -30,3 +30,7 @@ At service startup, app identity is unknown until a qualifying event arrives; De
 5. If proposing a bundled identity or layout, add focused policy tests and document the scope of actual testing. Keep a Default fallback.
 
 Only configured preset identities are saved. The current app is held in memory; no app-use history is recorded or uploaded. Key mapping, ad detection, and speaker discovery are separate extension areas.
+
+### Prime Video starting layout
+
+Fresh installs use a 95% cover with a timer cutout at left 1685, top 72, width 138, height 54, in 1920 × 1080 reference coordinates. The right and bottom edges were tuned on the original projector. Other resolutions scale proportionally, but different app layouts may need adjustment. Existing saved layouts, including legacy upgrades, are preserved.

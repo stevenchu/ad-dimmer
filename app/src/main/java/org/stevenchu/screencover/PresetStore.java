@@ -36,7 +36,10 @@ public final class PresetStore {
               old.getBoolean("timer", true));
       SharedPreferences.Editor edit = data.edit();
       write(edit, AppPresetPolicy.DEFAULT, inherited);
-      write(edit, AppPresetPolicy.PRIME, inherited);
+      // Preserve layouts from the legacy app; fresh installs use the calibrated Prime cutout.
+      boolean legacyLayout = old.contains("left") || old.contains("top")
+          || old.contains("width") || old.contains("height");
+      write(edit, AppPresetPolicy.PRIME, legacyLayout ? inherited : primeDefault());
       edit.putStringSet("apps", new HashSet<>(Arrays.asList(AppPresetPolicy.PRIME)))
           .putString("name." + AppPresetPolicy.PRIME, "Prime Video")
           .putBoolean("automatic", true)
@@ -44,6 +47,11 @@ public final class PresetStore {
           .putInt("schema", 1)
           .commit();
     }
+  }
+
+  /** Calibrated on Prime Video at 1080p; coordinates scale with the overlay. */
+  public static Visual primeDefault() {
+    return new Visual(95, 1685, 72, 138, 54, true);
   }
 
   public Set<String> apps() {
