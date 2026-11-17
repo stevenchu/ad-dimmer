@@ -39,7 +39,7 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 
 - Change the darkness; the default is **95%**.
 - Move or resize the timer opening—or hide it entirely.
-- Save a layout for each app, with automatic selection or a manual choice.
+- **Automatic app-aware masks** — Detects whether you're using HBO Max or Prime Video and automatically selects the correct mask, keeping the ad countdown visible while dimming the rest of the screen. You can also save a layout for each app or choose a mask manually.
 - Optionally connect **Sonos** to mute and restore sound too. Other audio outputs are not currently controlled.
 
 ## Before you install
@@ -48,7 +48,7 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 
 This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Optional audio was tested with a Sonos Arc Ultra.
 
-It does not record your screen or send viewing history anywhere. Accessibility identifies the active app and remote buttons; optional Sonos control stays on your home network. [Privacy](PRIVACY.md) · [Known limits and testing](docs/VERIFICATION.md)
+**Privacy by design** — Uses only the active app's identity to select the appropriate mask, without accessing viewing content. It does not send viewing history anywhere. Accessibility also handles remote buttons. Optional Sonos control stays on your home network. [Privacy](PRIVACY.md) · [Known limits and testing](docs/VERIFICATION.md)
 
 ## Help it grow
 
