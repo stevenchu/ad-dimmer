@@ -4,9 +4,9 @@
 
 Choose a remote shortcut to darken the picture. Keep the ad countdown visible, then use the shortcut again—or press **Back**—to return.
 
-Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes. **Tested on Android 11 with Prime Video; other setups need testers.**
+Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes. **Tested with Prime Video and HBO Max on an Android 11 XGIMI Halo+.**
 
-**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.3.2/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
+**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.4.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
 ![Before and after an illustrative 95% ad dimmer, with the countdown visible](docs/ad-dimmer-demo.png)
 
@@ -29,6 +29,7 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 | --- | --- |
 | Your confirmed shortcut | Dim / restore the picture |
 | Back while dimmed | Restore the picture |
+| Left or Right while dimmed | Switch the timer preset |
 | Volume Up while dimmed | Restore the picture and raise volume |
 | Tap or hold Volume Down (default) | Normal immediate volume control |
 
@@ -45,7 +46,7 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 
 **You trigger it yourself.** Ad Dimmer does not detect or skip ads. Playback is intended to continue underneath; press the shortcut again when the ad ends.
 
-This is an **experimental release**. The tested setup is Prime Video on an Android 11 XGIMI Halo+ with a Bluetooth remote; optional audio was tested with a Sonos Arc Ultra. Requires Android TV. Other devices, Android versions, and streaming apps remain unverified.
+This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Optional audio was tested with a Sonos Arc Ultra.
 
 It does not record your screen or send viewing history anywhere. Accessibility identifies the active app and remote buttons; optional Sonos control stays on your home network. [Privacy](PRIVACY.md) · [Known limits and testing](docs/VERIFICATION.md)
 

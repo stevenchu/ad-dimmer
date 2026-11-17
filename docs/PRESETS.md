@@ -1,12 +1,14 @@
-# App presets: contributor foundation
+# App presets
 
 The cover is still manually toggled. Automatic selection changes **which saved visual layout** is used; it never decides when an ad begins or ends.
 
 ## User flow
 
-Open Ad Dimmer from Android TV's Apps list. Choose **Preset to edit**, adjust opacity and timer geometry, and save. Automatic app selection is on by default. Turn it off to always use the preset selected in the editor.
+Open Ad Dimmer from Android TV's Apps list. Choose a preset in **Picture** to adjust darkness or enable its timer opening. Set the opening's position and size in **Advanced**. Select **Save picture** or **Save position** to keep your changes.
 
-Prime Video is the only bundled app identity: `com.amazon.amazonvideo.livingroom`. Its initial layout copies your previous settings. Default handles everything without a saved profile. Audio settings are global, so changing video apps cannot redirect mute to another soundbar.
+The bundled presets are Prime Video (upper right), HBO Max (upper left), and Full dimming (no opening). The HBO Max opening covers the Ad badge and countdown in the reference photo. Its alignment during playback may need adjustment. Audio settings are global.
+
+With the cover on, press **Left** or **Right** to cycle through presets. The cover stays in place and shows the selected preset name. With automatic selection on, Ad Dimmer remembers your choice for the detected app profile. Apps without a configured profile share the Full dimming fallback. Cycling back to the automatic preset clears the override. With automatic selection off, your last manual choice applies across apps.
 
 To add another app, use **Add an app preset (advanced)** with its Android package ID and a name. The new preset copies Default and starts unverified. Save edits before selecting a different profile. A name or saved profile is not evidence of playback compatibility.
 
@@ -14,12 +16,12 @@ To add another app, use **Add an app preset (advanced)** with its Android packag
 
 - **AppPresetPolicy.java**: pure selection rules. Tracks a current app in memory, rejects our own package and common system/keyboard events, selects automatic/manual/default. Unit tests live in `AppPresetPolicyTest.java`.
 - **CoverService.java**: consumes only `TYPE_WINDOW_STATE_CHANGED` package identifiers. Accepts saved identities, launchable TV/mobile apps, and TV Settings. Short debounce coalesces transitions. No text or screen-node reads. Identity inferred from these events is best-effort, not an authoritative foreground-task API.
-- **PresetStore.java**: schema version 1. Separate visual values per app, saved custom identities, automatic/manual choice. First migration copies legacy global visual settings to Default and Prime. Subsequent starts preserve edits.
+- **PresetStore.java**: schema version 6 updates the original HBO Max preview layout while preserving custom positions. It saves the automatic/manual choice, manual preset, and overrides by configured profile.
 - **MainActivity.java**: remote-accessible preset editor and validation. It keeps audio settings global.
 
-When covering, the service freezes a visual snapshot. Our own overlay, keyboard, and transient system windows must not replace the video preset. A confirmed change to a different launchable app removes the cover and requests restoration of the saved audio state. Returning to Prime selects its layout again, but does not automatically cover it.
+While covered, only an explicit Left/Right press changes the layout. A confirmed change to a different launchable app removes the cover and requests restoration of the saved audio state.
 
-At service startup, app identity is unknown until a qualifying event arrives; Default applies in the meantime. Returning to the video app produces a new event on the tested device. Manual selection is the fallback where firmware does not emit reliable events.
+At service startup, app identity is unknown until a qualifying window event arrives. Full dimming or its saved override applies in the meantime. Manual selection is available when firmware emits unreliable events.
 
 ## Adding a supported app
 
@@ -34,3 +36,7 @@ Only configured preset identities are saved. The current app is held in memory; 
 ### Prime Video starting layout
 
 Fresh installs use a 95% cover with a timer cutout at left 1685, top 72, width 138, height 54, in 1920 × 1080 reference coordinates. The right and bottom edges were tuned on the original projector. Other resolutions scale proportionally, but different app layouts may need adjustment. Existing saved layouts, including legacy upgrades, are preserved.
+
+### HBO Max starting layout
+
+The rectangular opening starts at left 106, top 74, with width 226 and height 43 in 1920 × 1080 reference coordinates.

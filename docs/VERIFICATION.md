@@ -1,5 +1,14 @@
 # What has been verified
 
+## v0.4.0 preview — mask profiles
+
+- Local: configuration, preset policy, and shortcut tests pass. The community development APK builds and its signature verifies.
+- XGIMI Halo+ (Android 11, 1920 × 1080): the personal preview updated v0.3.2 in place. The service reported the saved double-press Menu mapping and Prime Video's 95% cutout at 1685, 72, 138 × 54.
+- Opening HBO Max and Prime Video over ADB produced actual window events and selected each app's preset. The shell-only preview command enabled the cover in Prime Video. Switching to HBO Max cleared it and the service verified Sonos mute restoration.
+- With HBO Max open, synthetic Left/Right events sent directly to the service changed profiles while the cover stayed on and both halves of the key press were consumed. The HBO Max override survived reinstalling the same preview, which restarted the service. Cycling back to HBO Max cleared the override.
+- The final HBO Max rectangle was calibrated from live-ad photos at left 106, top 74, width 226, and height 43. The owner confirmed the final fit during playback. On-device pixel checks verified that the opening stays transparent at the edges.
+- ADB-injected Menu presses did not trigger the shortcut and cannot stand in for the Bluetooth remote.
+
 ## v0.3.1 — simpler settings
 
 The personal build was installed on the Android 11 projector. Native D-pad focus and the Shortcut/Picture screens were inspected on-device. A separate QA build exercised save/discard navigation, picture persistence, audio-address validation, geometry validation, and conditional single-press warnings. Existing configuration, preset, and shortcut tests pass. The saved Menu shortcut and 95% Prime preset were preserved. This update does not add a new physical-remote compatibility claim.

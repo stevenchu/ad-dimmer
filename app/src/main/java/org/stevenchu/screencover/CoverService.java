@@ -15,6 +15,8 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.*;
 import java.io.*;
 import java.net.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.*;
 
 public class CoverService extends AccessibilityService {
@@ -117,6 +119,9 @@ public class CoverService extends AccessibilityService {
   private AudioManager audio;
   private WindowManager wm;
   private View cover;
+  private String coverProfile, coverDetectedProfile;
+  private PresetStore.Visual coverVisual;
+  private final Set<Integer> profileKeysDown = new HashSet<>();
   private final AppPresetPolicy appPolicy = new AppPresetPolicy();
   private PresetStore presets;
   private String pendingPackage;
@@ -130,7 +135,12 @@ public class CoverService extends AccessibilityService {
   }
 
   public String selectedPreset() {
-    return appPolicy.select(presets.automatic(), presets.manual(), presets.apps());
+    if (presets.automatic()) return presets.automaticProfile(detectedProfile());
+    return appPolicy.select(false, presets.manual(), presets.apps());
+  }
+
+  private String detectedProfile() {
+    return appPolicy.select(true, AppPresetPolicy.DEFAULT, presets.apps());
   }
 
   private boolean confirmedApp(String pkg) {
@@ -281,6 +291,18 @@ public class CoverService extends AccessibilityService {
       return true;
     }
     if (key == KeyEvent.KEYCODE_VOLUME_UP && down && cover != null) hide();
+    if (key == KeyEvent.KEYCODE_DPAD_LEFT || key == KeyEvent.KEYCODE_DPAD_RIGHT) {
+      // Consume the matching release even if another action has already removed the cover.
+      if (!down && profileKeysDown.remove(key)) return true;
+      if (down && profileKeysDown.contains(key)) return true;
+      if (down && cover != null && e.getRepeatCount() == 0) {
+        profileKeysDown.add(key);
+        if (gesture != null) gesture.reset();
+        h.removeCallbacks(holdCheck);
+        switchProfile(key == KeyEvent.KEYCODE_DPAD_RIGHT);
+        return true;
+      }
+    }
     // Recording is observational: essential buttons and native single actions remain available.
     if (recording && !down && ShortcutPolicy.allowed(key, "double")) {
       recorded = key;
@@ -319,14 +341,23 @@ public class CoverService extends AccessibilityService {
     else hide();
   }
 
+  private void switchProfile(boolean right) {
+    coverProfile = AppPresetPolicy.cycle(coverProfile, right, presets.apps());
+    coverVisual = presets.read(coverProfile);
+    presets.saveSelection(coverDetectedProfile, coverProfile);
+    cover.invalidate();
+  }
+
   private void show() {
-    // Freeze this immutable visual snapshot until uncovered; system popups cannot change it.
-    String selected = selectedPreset();
-    final PresetStore.Visual visual = presets.read(selected);
+    // Keep the chosen layout until a remote arrow switches it or the cover closes.
+    coverDetectedProfile = detectedProfile();
+    coverProfile = selectedPreset();
+    coverVisual = presets.read(coverProfile);
     View v =
         new View(this) {
           protected void onDraw(Canvas c) {
             super.onDraw(c);
+            PresetStore.Visual visual = coverVisual;
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setColor(Color.argb(Math.round(visual.opacity * 255f / 100f), 0, 0, 0));
             // Reference geometry is in 1920 x 1080 pixels and scales to the display.
@@ -334,16 +365,28 @@ public class CoverService extends AccessibilityService {
             float sx = getWidth() / 1920f, sy = getHeight() / 1080f;
             float left = visual.left * sx, top = visual.top * sy;
             RectF timer = new RectF(left, top, left + visual.width * sx, top + visual.height * sy);
-            Path mask = new Path();
-            mask.setFillType(Path.FillType.EVEN_ODD);
-            mask.addRect(0, 0, getWidth(), getHeight(), Path.Direction.CW);
-            if (visual.timer)
-              mask.addRoundRect(timer, timer.height() / 2f, timer.height() / 2f, Path.Direction.CW);
-            c.drawPath(mask, paint);
+            if (visual.timer && AppPresetPolicy.HBO_MAX.equals(coverProfile)) {
+              // Leave the opening unpainted. Nonoverlapping strips keep the opacity uniform.
+              paint.setAntiAlias(false);
+              c.drawRect(0, 0, getWidth(), timer.top, paint);
+              c.drawRect(0, timer.bottom, getWidth(), getHeight(), paint);
+              c.drawRect(0, timer.top, timer.left, timer.bottom, paint);
+              c.drawRect(timer.right, timer.top, getWidth(), timer.bottom, paint);
+              paint.setAntiAlias(true);
+            } else {
+              Path mask = new Path();
+              mask.setFillType(Path.FillType.EVEN_ODD);
+              mask.addRect(0, 0, getWidth(), getHeight(), Path.Direction.CW);
+              if (visual.timer)
+                mask.addRoundRect(timer, timer.height() / 2f, timer.height() / 2f, Path.Direction.CW);
+              c.drawPath(mask, paint);
+            }
             paint.setColor(Color.argb(110, 220, 225, 230));
             paint.setTextSize(18 * getResources().getDisplayMetrics().density);
             paint.setTextAlign(Paint.Align.CENTER);
-            c.drawText("Press Back to return", getWidth() / 2f, getHeight() - 45, paint);
+            c.drawText(
+                presets.name(coverProfile) + "   ·   ◀ ▶ Change preset   ·   Back to return",
+                getWidth() / 2f, getHeight() - 45, paint);
           }
         };
     WindowManager.LayoutParams p =

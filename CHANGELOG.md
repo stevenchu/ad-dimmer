@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-11-17
+
+- Added a 95% HBO Max preset with a calibrated 226 × 43 px rectangular timer opening at left 106, top 74 on the 1920 × 1080 reference screen.
+- Added Full dimming for apps without a configured opening.
+- Left and Right switch presets while the cover is active. Automatic selection remembers overrides by app profile. Manual mode remembers the last selection across apps.
+- Upgrades preserve custom timer geometry, opacity, and shortcut settings.
+
 ## 0.2.1 — 2026-10-30
 
 - Renamed the project and app display name to Ad Dimmer; internal app ID and signing identity stay unchanged for upgrades.

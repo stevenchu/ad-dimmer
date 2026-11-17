@@ -214,11 +214,7 @@ public class MainActivity extends Activity {
   private void picture() {
     heading("Picture", "Choose how much of the ad you want to see.");
     ui.label(panel, "Preset");
-    List<String> ids = new ArrayList<>();
-    ids.add(AppPresetPolicy.DEFAULT);
-    List<String> apps = new ArrayList<>(presets.apps());
-    Collections.sort(apps);
-    ids.addAll(apps);
+    List<String> ids = AppPresetPolicy.orderedProfiles(presets.apps());
     List<String> labels = new ArrayList<>();
     for (String id : ids) labels.add(presets.name(id));
     Spinner profile = ui.spinner(labels);
@@ -261,6 +257,7 @@ public class MainActivity extends Activity {
     CheckBox auto = ui.check("Choose preset automatically", automatic);
     auto.setOnCheckedChangeListener((b, on) -> automatic = on);
     panel.addView(auto);
+    ui.note(panel, "While dimmed, press Left or Right to switch presets.");
     TextView value = ui.text("Darkness   " + draft.opacity + "%", 20, true);
     panel.addView(value);
     SeekBar slider = new SeekBar(this);
@@ -291,7 +288,7 @@ public class MainActivity extends Activity {
             draft =
                 new PresetStore.Visual(
                     draft.opacity, draft.left, draft.top, draft.width, draft.height, on));
-    panel.addView(timer);
+    if (!AppPresetPolicy.FULL_DIM.equals(editing)) panel.addView(timer);
     ui.addButton(panel, ui.button("Save picture", true, this::savePicture));
   }
 
@@ -344,15 +341,17 @@ public class MainActivity extends Activity {
   }
 
   private void advanced() {
-    heading("Timer opening", presets.name(editing) + " · 1920 × 1080 reference pixels");
-    LinearLayout row = ui.row();
-    left = geometry(row, "Left", draft.left);
-    top = geometry(row, "Top", draft.top);
-    width = geometry(row, "Width", draft.width);
-    height = geometry(row, "Height", draft.height);
-    panel.addView(row);
-    ui.addButton(panel, ui.button("Save position", true, this::savePicture));
-    ui.gap(panel, 10);
+    if (!AppPresetPolicy.FULL_DIM.equals(editing)) {
+      heading("Timer opening", presets.name(editing) + " · 1920 × 1080 reference pixels");
+      LinearLayout row = ui.row();
+      left = geometry(row, "Left", draft.left);
+      top = geometry(row, "Top", draft.top);
+      width = geometry(row, "Width", draft.width);
+      height = geometry(row, "Height", draft.height);
+      panel.addView(row);
+      ui.addButton(panel, ui.button("Save position", true, this::savePicture));
+      ui.gap(panel, 10);
+    }
     ui.label(panel, "More app presets");
     ui.note(panel, "For contributors: add the app's Android package ID.");
     EditText id = ui.input("", false);
