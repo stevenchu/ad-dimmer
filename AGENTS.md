@@ -9,3 +9,7 @@ Product direction confirmed on 2026-11-19.
 - As inspected on 2026-11-19 at commit a117809, `CoverService.sound(boolean)` implements Sonos muting only. The app requests `MODIFY_AUDIO_SETTINGS` and initializes `AudioManager`, but general Android media muting still needs implementation and device testing.
 - Treat the current Sonos-only behavior as an implementation gap when planning audio functionality. Check the current code and verification records before describing shipped behavior or changing product copy.
 - Advertise general muting once implemented and verified. Android audio control depends on device and output configuration, including fixed-volume outputs. Compatibility across all Android TV devices and audio routes remains unverified.
+
+## Installation assistance
+
+For user installation requests, follow [the AI installation guide](docs/AI-INSTALL.md). It covers release selection, device connection, updates that preserve settings, physical remote testing, and recovery. Use the public release and confirm its current behavior before promising features.

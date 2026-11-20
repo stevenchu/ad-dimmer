@@ -1,5 +1,7 @@
 # Set up Ad Dimmer
 
+For help from an AI assistant, follow the [AI installation guide](AI-INSTALL.md). It covers connecting your computer, installing the official release, and checking the result.
+
 ## Install
 
 Download `AdDimmer.apk` from the project's GitHub release onto your Android TV device. Use a file-transfer app or USB drive and open it with a file manager. Android may ask you to allow that file manager to install unknown apps. Turn that permission back off afterward if you no longer need it.

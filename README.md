@@ -14,6 +14,8 @@ Free and open source. Made for Android TV devices, including TVs, projectors, an
 
 ## Set it up
 
+**Want help installing?** Share this repository with your AI assistant and ask it to guide you through setup on your Android TV. An assistant with access to your computer can also help install the app. [Start with the AI installation guide](docs/AI-INSTALL.md).
+
 1. **Install the app** on your Android TV device. [Need help?](docs/SETUP.md)
 2. **Open Ad Dimmer** from your Apps list. Use **Picture** to set darkness and **Advanced** to adjust the timer opening.
 3. **Enable Ad Dimmer remote shortcut** in Android's Accessibility settings.
