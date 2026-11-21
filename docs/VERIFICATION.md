@@ -1,5 +1,13 @@
 # What has been verified
 
+## v0.5.0 source preview — Android media muting
+
+- Local tests cover unmuted and already-muted starting states, repeated cleanup, user unmute, service recreation, failed persistence, ignored/failed audio requests, restoration failures, and recovery retries. Existing configuration, presets, and shortcut tests pass.
+- APK compilation and signature verification pass using a development signing key.
+- The previously used Halo+ address timed out on 2026-11-20. No installation or live audio/physical-remote checks were completed for this change.
+- Pending device checks include audible mute and restoration using the physical shortcut, Back, Volume Up, app changes, service disable/re-enable, initially muted playback, and separate speaker/Bluetooth/external-output routes. Android-reported mute state alone cannot confirm that an external speaker is silent.
+- The public download remains v0.4.0 until a new release is published.
+
 ## v0.4.0 preview — mask profiles
 
 - Local: configuration, preset policy, and shortcut tests pass. The community development APK builds and its signature verifies.

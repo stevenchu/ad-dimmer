@@ -48,6 +48,8 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 
 ## Before you install
 
+**Source preview:** The next release adds Android TV media muting and restoration with the dimming shortcut. Local tests pass; device and audio-output verification is pending. The linked v0.4.0 download currently supports Sonos audio control.
+
 **You trigger it yourself.** Ad Dimmer does not detect or skip ads. Playback is intended to continue underneath; press the shortcut again when the ad ends.
 
 This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Optional audio was tested with a Sonos Arc Ultra.

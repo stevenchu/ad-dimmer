@@ -8,7 +8,8 @@ Report **device + Android version + streaming app/version + remote + audio route
 - Run `scripts/build.sh`: compile and verify APK signature.
 - Device checks: legacy settings migrate once; profiles remain isolated; saving survives a service/process restart; actual Prime events select Prime; switching to TV Settings uncovers and restores sound.
 - Open HBO Max and confirm the upper-left opening shows both the Ad badge and countdown during an ad. Press Left/Right while covered and confirm the preset changes once per press, the arrows stay out of the streaming app, and the cover stays on. Close and reopen the cover, restart the service, and confirm the choice persists. Switch to Prime and confirm its separate preset. With automatic selection off, confirm the last manually selected preset applies in both apps.
-- Verify optional Sonos off does not affect the speaker. When enabled, test initially muted and unmuted states and report unreachable-speaker behavior separately.
+- In the v0.5.0 source preview with Sonos disabled, verify Android media mute and restoration using the physical shortcut, Back, Volume Up, app changes, Accessibility disable/re-enable, and process restart. Start once already muted and verify it stays muted. Start once unmuted and verify normal volume is preserved. Test repeated cover/uncover cycles and a failed or unsupported audio route. Report both Android mute state and audible speaker behavior.
+- With Sonos enabled, verify direct Sonos control and preservation of the Android media state. Test initially muted and unmuted speaker states and report unreachable-speaker behavior separately.
 
 Synthetic app identifiers exercise the policy and storage. They do not establish Netflix, Hulu, Disney+, or other streaming compatibility. Synthetic key events do not establish Bluetooth gesture behavior.
 

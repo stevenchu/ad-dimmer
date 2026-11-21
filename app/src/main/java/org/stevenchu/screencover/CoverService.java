@@ -81,6 +81,23 @@ public class CoverService extends AccessibilityService {
   }
 
   private void sound(boolean covered) {
+    try {
+      if (covered) {
+        if (!getSharedPreferences("settings", 0).getBoolean("sonos", false)) mediaMute.mute();
+      } else {
+        mediaMute.restore();
+      }
+    } catch (RuntimeException e) {
+      Log.e("ScreenCover", "Android audio control failed", e);
+      toast(
+          covered
+              ? "Could not mute Android TV audio. Check your audio output or use Sonos control."
+              : "Could not restore Android TV audio. Use your remote to unmute.");
+    }
+    sonosSound(covered);
+  }
+
+  private void sonosSound(boolean covered) {
     network.execute(
         () -> {
           try {
@@ -117,6 +134,7 @@ public class CoverService extends AccessibilityService {
 
   private final Handler h = new Handler(Looper.getMainLooper());
   private AudioManager audio;
+  private MediaMute mediaMute;
   private WindowManager wm;
   private View cover;
   private String coverProfile, coverDetectedProfile;
@@ -267,13 +285,43 @@ public class CoverService extends AccessibilityService {
     shortcutStore = new ShortcutStore(this);
     loadShortcut();
     audio = (AudioManager) getSystemService(AUDIO_SERVICE);
+    android.content.SharedPreferences recovery = getSharedPreferences("android_audio_recovery", 0);
+    mediaMute =
+        new MediaMute(
+            new MediaMute.Audio() {
+              public boolean isMuted() {
+                return audio.isStreamMute(AudioManager.STREAM_MUSIC);
+              }
+
+              public void setMuted(boolean muted) {
+                if (audio.isVolumeFixed()) {
+                  throw new UnsupportedOperationException("This output has fixed volume");
+                }
+                audio.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    muted ? AudioManager.ADJUST_MUTE : AudioManager.ADJUST_UNMUTE,
+                    0);
+              }
+            },
+            new MediaMute.Recovery() {
+              public boolean pending() {
+                return recovery.getBoolean("restore", false);
+              }
+
+              public void save(boolean pending) {
+                if (!recovery.edit().putBoolean("restore", pending).commit()) {
+                  throw new IllegalStateException("Could not save Android audio recovery state");
+                }
+              }
+            });
     wm = (WindowManager) getSystemService(WINDOW_SERVICE);
     Log.i("ScreenCover", "connected");
     if (getSharedPreferences("recovery", 0).getBoolean("restore", false)) {
       originalMute = getSharedPreferences("recovery", 0).getBoolean("mute", false);
       audioHost = getSharedPreferences("recovery", 0).getString("host", "");
-      sound(false);
     }
+    // Recover each output independently, even if the sound settings have changed.
+    sound(false);
   }
 
   protected boolean onKeyEvent(KeyEvent e) {
@@ -417,9 +465,9 @@ public class CoverService extends AccessibilityService {
       } catch (Exception ignored) {
       }
       cover = null;
-      sound(false);
       Log.i("ScreenCover", "cover off");
     }
+    if (mediaMute != null) sound(false);
   }
 
   public void onAccessibilityEvent(AccessibilityEvent e) {
@@ -431,6 +479,11 @@ public class CoverService extends AccessibilityService {
     pendingPackage = pkg;
     h.removeCallbacks(confirmPackage);
     h.postDelayed(confirmPackage, 200);
+  }
+
+  public boolean onUnbind(android.content.Intent intent) {
+    hide();
+    return super.onUnbind(intent);
   }
 
   public void onInterrupt() {

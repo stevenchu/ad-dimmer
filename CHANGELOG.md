@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0 preview — unreleased
+
+- Added Android TV media muting when the cover appears, with restoration on uncover, service interruption, and service reconnection. Already-muted audio stays muted. The pending restoration is saved before muting and retained for retry after a failed restore.
+- Existing Sonos configurations continue to use direct Sonos control. Android audio failures show a message while the picture cover remains usable.
+- Local recovery tests and APK build pass. Device and audio-output verification is pending. The public download remains v0.4.0.
+
 ## 0.4.0 — 2026-11-17
 
 - Added a 95% HBO Max preset with a calibrated 226 × 43 px rectangular timer opening at left 106, top 74 on the 1920 × 1080 reference screen.

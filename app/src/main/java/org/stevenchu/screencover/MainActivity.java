@@ -293,7 +293,11 @@ public class MainActivity extends Activity {
   }
 
   private void sound() {
-    heading("Sound", "Optional Sonos mute while the picture is dimmed.");
+    heading(
+        "Sound",
+        "Android TV media audio mutes while dimmed and returns to its previous mute state. "
+            + "For a Sonos speaker, enable direct Sonos control instead. "
+            + "Some fixed-volume or external audio outputs need separate control.");
     boolean enabled = prefs.getBoolean("sonos", false);
     CheckBox toggle = ui.check("Mute Sonos", enabled);
     soundToggle = toggle;

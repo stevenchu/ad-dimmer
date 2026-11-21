@@ -8,7 +8,7 @@ Copy this request into your assistant and include your TV model and computer ope
 
 ## Instructions for the assistant
 
-Read the current [README](../README.md), [setup guide](SETUP.md), [shortcut guide](SHORTCUTS.md), and [project context](../AGENTS.md). Check the release notes for the APK you will install. The current implementation and release determine available features. General Android TV muting is intended functionality still awaiting implementation and testing as of November 20, 2026. The current public v0.4.0 release controls Sonos audio when configured.
+Read the current [README](../README.md), [setup guide](SETUP.md), [shortcut guide](SHORTCUTS.md), and [project context](../AGENTS.md). Check the release notes for the APK you will install. The current implementation and release determine available features. The unreleased v0.5.0 source preview implements Android TV media muting with local recovery tests passing and live device verification pending. The current public v0.4.0 release controls Sonos audio when configured.
 
 ### 1. Establish the setup
 

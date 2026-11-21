@@ -10,6 +10,8 @@ If your TV cannot open APK files, use the computer method below. A Google Play a
 
 ## Choose your settings
 
+The public v0.4.0 download uses optional Sonos audio control. The unreleased v0.5.0 source preview mutes Android TV media audio by default and restores the previous mute state when uncovered. With Sonos enabled it uses direct Sonos control instead. Fixed-volume and some external audio outputs can prevent Android media muting. Live device verification of this preview is pending.
+
 Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
 
 - **Shortcut:** choose and test your remote button.
