@@ -1,6 +1,6 @@
 # Ad Dimmer
 
-**Dim ad breaks with your Android TV remote.**
+**Make streaming ads less distracting with a shortcut on your Android TV remote.**
 
 Choose a remote shortcut to darken the picture. Keep the ad countdown visible, then use the shortcut again—or press **Back**—to return.
 
