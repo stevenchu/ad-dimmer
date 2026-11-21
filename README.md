@@ -4,7 +4,7 @@
 
 Press your shortcut to darken the screen while keeping the ad countdown visible. Press it again when you’re ready to return.
 
-Includes ready-to-use masks for Prime Video and HBO Max, with adjustable layouts for other streaming apps. Optional Sonos support mutes and restores sound too.
+Includes ready-to-use masks for Prime Video and HBO Max, with adjustable layouts for other streaming apps.
 
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes.
 
