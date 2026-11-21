@@ -1,5 +1,20 @@
 # What has been verified
 
+## v0.5.1 — combined Android and Sonos control
+
+Tested on 2026-11-21 with the Android 11 Halo+ and Sonos Arc Ultra over HDMI ARC.
+
+- Android volume changes initially produced later HDMI unmute/volume feedback. A one-second settling approach worked audibly, but the owner requested less delay. The final path uses the AOSP internal HDMI-origin volume flag to suppress forwarding, with delayed mute checks and an automatically learned settling fallback for devices that still override it. The flag’s forwarding behavior is visible in the [Android 11 AudioService source](https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-30/+/refs/heads/androidx-room-release/com/android/server/audio/AudioService.java).
+- The final implementation reads Sonos mute and volume concurrently before changing audio. Sustained combined cycles kept Android at zero and Sonos muted, then restored the original Android level and exact Sonos volume and mute state. An initially muted speaker stayed muted.
+- A deliberately invalid Sonos configuration exercised the failure path while the Android volume-zero attempt still ran. The test restored the real connection afterward.
+- Actual process death while covered exercised durable restoration of both Android and Sonos state.
+- The owner confirmed the final physical shortcut shows the HBO Max label and top-left opening, and that muting feels faster.
+- The Sound page has a single optional speaker-address field and no audio-mode checkbox. The existing saved Sonos connection is retained.
+- Forced speaker unmute exercised startup verification: it reapplied mute and selected the slower compatibility fallback. A subsequent fallback cycle muted and restored correctly. The Halo+ was returned to the verified fast path afterward. Delayed verification did not remute after an immediate uncover.
+- The reported HBO/Default mismatch was traced to an empty app identity after reinstall plus a saved Default override for unknown apps. The app now restores the latest confirmed identity across same-boot reconnects, applies pending app events before cover selection, and uses Full dimming when identity is unavailable. HBO remained selected across reinstall and process restart, and a diagnostic unknown-identity check ignored the saved Default override.
+- The normal path has no fixed settling delay. Measured mute verification was approximately 300–700 ms on the home network, including snapshot reads and verification. Timing varies with network and device response. The internal flag is outside the public SDK contract, and compatibility on other firmware remains unverified.
+- The reported wrong HBO mask was reproduced after a service restart with an empty app identity and a saved unknown-app override to Default. Confirmed app identity now survives a same-boot process restart, HBO selects its top-left preset, and app changes select their own profile after actual window events. Bluetooth and other device/output combinations remain unverified.
+
 ## v0.5.0 — Android media muting
 
 Verified on 2026-11-20 with the Android 11 XGIMI Halo+ using built-in speakers and direct Sonos control disabled. The personal package was updated in place with its existing signing key; its saved double-press Menu shortcut and picture settings were retained.

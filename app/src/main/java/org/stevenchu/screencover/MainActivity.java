@@ -16,7 +16,6 @@ public class MainActivity extends Activity {
   private LinearLayout panel;
   private TextView summary;
   private EditText soundHost;
-  private CheckBox soundToggle;
   private String editing;
   private String section = "Shortcut";
   private PresetStore.Visual draft;
@@ -100,8 +99,11 @@ public class MainActivity extends Activity {
     if (name.equals(section)) return;
     if (section.equals("Sound")
         && soundHost != null
-        && (soundToggle.isChecked() != prefs.getBoolean("sonos", false)
-            || !soundHost.getText().toString().trim().equals(prefs.getString("host", "")))) {
+        && !soundHost
+            .getText()
+            .toString()
+            .trim()
+            .equals(prefs.getBoolean("sonos", false) ? prefs.getString("host", "") : "")) {
       new AlertDialog.Builder(this)
           .setTitle("Save sound changes?")
           .setPositiveButton(
@@ -295,23 +297,17 @@ public class MainActivity extends Activity {
   private void sound() {
     heading(
         "Sound",
-        "Android TV media audio mutes while dimmed and returns to its previous volume. "
-            + "For a Sonos speaker, enable direct Sonos control instead. "
-            + "Some fixed-volume or external audio outputs need separate control.");
-    boolean enabled = prefs.getBoolean("sonos", false);
-    CheckBox toggle = ui.check("Mute Sonos", enabled);
-    soundToggle = toggle;
-    panel.addView(toggle);
+        "Android TV audio is controlled automatically while dimmed. "
+            + "Connect Sonos here to control that speaker as well.");
     LinearLayout address = ui.column();
-    ui.label(address, "Speaker address");
-    EditText host = ui.input(prefs.getString("host", ""), false);
+    ui.label(address, "Sonos speaker address (optional)");
+    EditText host =
+        ui.input(prefs.getBoolean("sonos", false) ? prefs.getString("host", "") : "", false);
     soundHost = host;
     host.setHint("From your Sonos app");
     address.addView(host);
+    ui.label(address, "Enter an address to connect Sonos. Clear it to disconnect.");
     panel.addView(address);
-    address.setVisibility(enabled ? View.VISIBLE : View.GONE);
-    toggle.setOnCheckedChangeListener(
-        (b, on) -> address.setVisibility(on ? View.VISIBLE : View.GONE));
     ui.addButton(panel, ui.button("Save sound", true, () -> saveSound()));
     ui.addButton(
         panel,
@@ -331,7 +327,7 @@ public class MainActivity extends Activity {
 
   private boolean saveSound() {
     String ip = soundHost.getText().toString().trim();
-    if (soundToggle.isChecked() && !Config.validHost(ip)) {
+    if (!ip.isEmpty() && !Config.validHost(ip)) {
       toast("Enter the speaker's private IPv4 address");
       return false;
     }
@@ -339,7 +335,7 @@ public class MainActivity extends Activity {
       toast("Uncover before changing sound settings");
       return false;
     }
-    prefs.edit().putBoolean("sonos", soundToggle.isChecked()).putString("host", ip).apply();
+    prefs.edit().putBoolean("sonos", !ip.isEmpty()).putString("host", ip).apply();
     toast("Sound saved");
     return true;
   }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1 — 2026-11-21
+
+- Android media control now runs on every cover, with connected Sonos control attempted as well. A Sonos setup failure allows the Android attempt to continue.
+- Simplified Sound settings to one optional speaker-address field. Save an address to connect Sonos, or clear it to disconnect. Existing connection preferences are preserved.
+- Saved Sonos volume and mute state are captured concurrently before changing audio. The normal path suppresses competing HDMI volume commands and has no fixed one-second delay. Background verification selects a settling fallback automatically when needed. Speaker volume and mute state restore last.
+- Retain recovery records until both outputs finish restoration. Retry transient Android restoration failures.
+- Preserve confirmed app identity across same-boot service reconnects. Apply pending app events before selecting a mask. An unavailable identity uses Full dimming and guidance instead of an unrelated saved fallback opening.
+- On-device checks cover combined mute/restore cycles, exact Sonos volume restoration, already-muted state, continued Android attempts after Sonos setup failure, and process-death recovery.
+
 ## 0.5.0 — 2026-11-20
 
 - Added Android TV media muting by saving the current media volume and setting it to zero while the cover is active. Uncovering restores the saved level. Already-muted or zero-volume audio stays silent, and a nonzero volume changed by the user is preserved.

@@ -29,6 +29,10 @@ public final class MediaMute {
     this.recovery = recovery;
   }
 
+  public boolean pending() {
+    return recovery.pending();
+  }
+
   public void mute() {
     // Finish an interrupted session before taking a new snapshot.
     restore();

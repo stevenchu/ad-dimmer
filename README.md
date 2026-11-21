@@ -8,7 +8,7 @@ Includes ready-to-use masks for Prime Video and HBO Max, with adjustable layouts
 
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes.
 
-**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.5.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
+**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.5.1/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
 ![Before and after an illustrative 95% ad dimmer, with the countdown visible](docs/ad-dimmer-demo.png)
 
@@ -45,13 +45,13 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 - Move or resize the timer opening—or hide it entirely.
 - **Automatic app-aware masks** — Detects whether you're using HBO Max or Prime Video and automatically selects the correct mask, keeping the ad countdown visible while dimming the rest of the screen. You can also save a layout for each app or choose a mask manually.
 - **Android TV audio** — Silences media audio while dimmed and restores the previous volume when you return.
-- Optionally use direct **Sonos** control for a connected speaker.
+- Connect **Sonos** once to control that speaker alongside Android TV audio.
 
 ## Before you install
 
 **You trigger it yourself.** Ad Dimmer does not detect or skip ads. Playback is intended to continue underneath; press the shortcut again when the ad ends.
 
-This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Android media audio was verified with the projector’s built-in speakers. Audio control varies by device and output; fixed-volume and external audio routes may need separate control. Direct Sonos control was tested with a Sonos Arc Ultra.
+This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Android media audio was verified with the projector’s built-in speakers. Audio control varies by device and output; fixed-volume and external audio routes may need separate control. Combined Android and Sonos control was tested with a Sonos Arc Ultra over HDMI ARC.
 
 **Privacy by design** — Uses only the active app's identity to select the appropriate mask, without accessing viewing content. It does not send viewing history anywhere. Accessibility also handles remote buttons. Optional Sonos control stays on your home network. [Privacy](PRIVACY.md) · [Known limits and testing](docs/VERIFICATION.md)
 

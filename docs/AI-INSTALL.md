@@ -8,7 +8,7 @@ Copy this request into your assistant and include your TV model and computer ope
 
 ## Instructions for the assistant
 
-Read the current [README](../README.md), [setup guide](SETUP.md), [shortcut guide](SHORTCUTS.md), and [project context](../AGENTS.md). Check the release notes for the APK you will install. The current implementation and release determine available features. From v0.5.0, the shortcut silences Android TV media audio and restores the saved volume. Audible operation was verified on the Halo+ built-in speakers. Earlier releases require Sonos configuration for sound control. Other devices and audio routes need their own verification.
+Read the current [README](../README.md), [setup guide](SETUP.md), [shortcut guide](SHORTCUTS.md), and [project context](../AGENTS.md). Check the release notes for the APK you will install. The current implementation and release determine available features. From v0.5.0, the shortcut silences Android TV media audio and restores the saved volume. Audible operation was verified on the Halo+ built-in speakers. From v0.5.1, Android control runs alongside any connected Sonos speaker. Combined Sonos/HDMI ARC control was verified on the Halo+. Earlier releases require Sonos configuration for sound control. Other devices and audio routes need their own verification.
 
 ### 1. Establish the setup
 
@@ -104,7 +104,7 @@ Have the user play a video and physically try the following checks.
 - Normal volume controls behave as expected.
 - Prime Video and HBO Max select their respective presets. Left and Right switch presets while dimmed.
 - During an actual ad, the timer opening fits the countdown. Adjust it in Advanced when needed.
-- On v0.5.0 and newer, covering silences Android media audio and uncovering restores the previous volume. Confirm audible silence. If Sonos is configured, check its direct mute and restoration instead. Repeat once starting already muted.
+- On v0.5.0 and newer, covering silences Android media audio and uncovering restores the previous volume. Confirm audible silence. If Sonos is connected, check its mute and volume restoration as well. Repeat once starting already muted.
 - After restarting the TV, confirm Accessibility is still enabled and the shortcut works.
 
 Record separately what command output confirmed and what the user confirmed on the TV. A successful installation proves the APK installed. Physical remote behavior, timer alignment, protected-video playback, and audio need their own checks. Existing Halo+ test results describe that tested setup.

@@ -10,13 +10,13 @@ If your TV cannot open APK files, use the computer method below. A Google Play a
 
 ## Choose your settings
 
-From v0.5.0, Ad Dimmer silences Android TV media audio by default and restores the previous volume when uncovered. Already-muted audio stays muted. With Sonos enabled it uses direct Sonos control instead. Built-in speakers were verified on the Halo+; fixed-volume and some external audio outputs may need separate control.
+From v0.5.0, Ad Dimmer silences Android TV media audio by default and restores the previous volume when uncovered. Already-muted audio stays muted. From v0.5.1, a connected Sonos speaker is controlled alongside Android audio. Built-in speakers and combined Sonos control over HDMI ARC were verified on the Halo+. Fixed-volume and other external audio outputs may need separate control. Devices that override an immediate Sonos mute automatically use a slower compatibility path.
 
 Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
 
 - **Shortcut:** choose and test your remote button.
 - **Picture:** choose a preset, darkness, and whether to keep the ad timer visible. Choose **Save picture**.
-- **Sound:** Android TV media control works by default. For direct Sonos control, enable Sonos mute and enter your speaker address. Choose **Save sound**.
+- **Sound:** Android TV media control works by default. Enter your Sonos speaker address and choose **Save sound** to connect it. Clear the address and save to disconnect.
 - **Advanced:** move or resize the timer opening, or add an app preset. Positions use a 1920 × 1080 reference and scale with your display.
 
 Visual settings belong to each preset; sound settings apply to all presets. Automatic selection uses the detected app's saved preset, or Default. Other streaming apps still need testing.
@@ -69,6 +69,6 @@ If sound stays silent, raise the volume with your TV remote, or unmute directly 
 - **Double-tap does nothing:** check Accessibility is still enabled and another key-filtering service is not competing.
 - **Ordinary button actions also happen:** double-press and hold observe the button without delaying its normal action. Try another button if this interferes.
 - **Sound does not mute:** Android audio control depends on the output route. For a connected Sonos speaker, try direct Sonos control and check its saved address. Wi-Fi guest isolation can block that local control. Report the device, output route, and whether sound remains audible.
-- **Picture returns but no sound:** raise the TV volume, or use Sonos to unmute when direct Sonos control is enabled. Report the sequence and any error message.
+- **Picture returns but no sound:** raise the TV volume, or use Sonos to unmute when a speaker is connected. Report the sequence and any error message.
 - **Timer opening is wrong:** adjust its geometry; the app does not recognize the timer automatically.
 - **Video pauses:** report your device, Android version, and video app. Keeping playback active is not universal.

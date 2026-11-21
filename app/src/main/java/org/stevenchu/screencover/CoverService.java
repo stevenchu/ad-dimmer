@@ -30,8 +30,14 @@ public class CoverService extends AccessibilityService {
     return cover != null;
   }
 
-  private final ExecutorService network = Executors.newSingleThreadExecutor();
   private Boolean originalMute = null;
+  private int originalSonosVolume = -1;
+  // AOSP uses this internal flag for incoming HDMI volume updates to avoid forwarding them back
+  // over CEC. It is outside the public SDK contract; startup checks select the settling fallback
+  // when a device still undoes the speaker mute.
+  private static final int FLAG_HDMI_SYSTEM_AUDIO_VOLUME = 1 << 8;
+  private int mediaVolumeFlags;
+  private volatile long audioGeneration;
   private String audioHost = null;
 
   private String sonos(String action, String extra) throws Exception {
@@ -80,63 +86,170 @@ public class CoverService extends AccessibilityService {
     if (getMute() != value) throw new IOException("Sonos mute did not match");
   }
 
-  // Serialize Android audio work across service reconnections and keep it off the UI thread.
-  private static final ExecutorService mediaAudio = Executors.newSingleThreadExecutor();
-
-  private void sound(boolean covered) {
-    boolean useAndroid = !getSharedPreferences("settings", 0).getBoolean("sonos", false);
-    mediaAudio.execute(
-        () -> {
-          try {
-            if (covered && useAndroid) mediaMute.mute();
-            else mediaMute.restore();
-          } catch (RuntimeException e) {
-            Log.e("ScreenCover", "Android audio control failed", e);
-            h.post(
-                () ->
-                    toast(
-                        covered
-                            ? "Could not mute Android TV audio. Check your audio output or use"
-                                + " Sonos control."
-                            : "Could not restore Android TV audio. Use your remote to unmute."));
-          }
-        });
-    sonosSound(covered, !useAndroid);
+  private int getSonosVolume() throws Exception {
+    java.util.regex.Matcher match =
+        java.util.regex.Pattern.compile("<CurrentVolume>([0-9]{1,3})</CurrentVolume>")
+            .matcher(sonos("GetVolume", ""));
+    if (match.find()) {
+      int volume = Integer.parseInt(match.group(1));
+      if (volume <= 100) return volume;
+    }
+    throw new IOException("Invalid Sonos volume response");
   }
 
-  private void sonosSound(boolean covered, boolean useSonos) {
-    network.execute(
+  private void setSonosVolume(int volume) throws Exception {
+    sonos("SetVolume", "<DesiredVolume>" + volume + "</DesiredVolume>");
+    if (getSonosVolume() != volume) throw new IOException("Sonos volume did not match");
+  }
+
+  // Serialize audio changes across service reconnections and keep them off the UI thread.
+  private static final ExecutorService mediaAudio = Executors.newSingleThreadExecutor();
+  private static final ExecutorService speakerReads = Executors.newFixedThreadPool(2);
+
+  private void sound(boolean covered) {
+    boolean useSonos = getSharedPreferences("settings", 0).getBoolean("sonos", false);
+    String host = getSharedPreferences("settings", 0).getString("host", "");
+    long generation = ++audioGeneration;
+    mediaAudio.execute(
         () -> {
-          try {
-            if (covered) {
-              if (!useSonos) return;
-              if (originalMute == null) {
-                audioHost = getSharedPreferences("settings", 0).getString("host", "");
-                if (!Config.validHost(audioHost))
-                  throw new IOException("Enter a private IPv4 address in settings");
-                originalMute = getMute();
-                getSharedPreferences("recovery", 0)
-                    .edit()
-                    .putBoolean("restore", true)
-                    .putString("host", audioHost)
-                    .putBoolean("mute", originalMute)
-                    .commit();
+          long started = SystemClock.elapsedRealtime();
+          if (covered) {
+            mediaVolumeFlags =
+                useSonos && !getSharedPreferences("settings", 0).getBoolean("hdmi_settle", false)
+                    ? FLAG_HDMI_SYSTEM_AUDIO_VOLUME
+                    : 0;
+          }
+          boolean sonosReady = false;
+          if (covered && useSonos) {
+            try {
+              // Capture the speaker before Android volume changes can affect it through HDMI.
+              restoreSonos();
+              audioHost = host;
+              if (!Config.validHost(audioHost)) throw new IOException("Invalid Sonos address");
+              Future<Boolean> muteRead = speakerReads.submit(this::getMute);
+              Future<Integer> volumeRead = speakerReads.submit(this::getSonosVolume);
+              boolean previous;
+              int previousVolume;
+              try {
+                previous = muteRead.get();
+                previousVolume = volumeRead.get();
+              } finally {
+                muteRead.cancel(true);
+                volumeRead.cancel(true);
               }
-              setMute(true);
-            } else if (originalMute != null) {
-              setMute(originalMute);
-              originalMute = null;
-              getSharedPreferences("recovery", 0).edit().clear().commit();
+              if (!getSharedPreferences("recovery", 0)
+                  .edit()
+                  .putBoolean("restore", true)
+                  .putString("host", audioHost)
+                  .putBoolean("mute", previous)
+                  .putInt("volume", previousVolume)
+                  .putInt("flags", mediaVolumeFlags)
+                  .commit()) {
+                throw new IOException("Could not save Sonos recovery state");
+              }
+              originalMute = previous;
+              originalSonosVolume = previousVolume;
+              sonosReady = true;
+            } catch (Exception e) {
+              mediaVolumeFlags = 0;
+              audioFailure(
+                  "Could not reach Sonos. Android TV audio control will still be attempted.", e);
             }
-            Log.i("ScreenCover", "Sonos mute state verified");
+          }
+
+          try {
+            if (covered) mediaMute.mute();
+            else {
+              try {
+                mediaMute.restore();
+              } catch (RuntimeException first) {
+                // HDMI feedback may still be settling when the first read-back is checked.
+                SystemClock.sleep(250);
+                mediaMute.restore();
+              }
+            }
+          } catch (RuntimeException e) {
+            audioFailure(
+                covered
+                    ? "Could not mute Android TV audio. Check your audio output."
+                    : "Could not restore Android TV audio. Use your remote to raise the volume.",
+                e);
+          }
+
+          try {
+            if (needsHdmiSettle() && (sonosReady || (!covered && originalMute != null))) {
+              // HDMI volume feedback can arrive after setStreamVolume returns and undo a speaker
+              // mute. Let that response settle, then apply the speaker's final mute state.
+              SystemClock.sleep(1000);
+            }
+            if (covered) {
+              if (sonosReady) {
+                setMute(true);
+                Log.i(
+                    "ScreenCover",
+                    "Sonos mute verified in " + (SystemClock.elapsedRealtime() - started) + " ms");
+                checkSonosMute(generation, 750);
+                checkSonosMute(generation, 1500);
+              }
+            } else {
+              restoreSonos();
+            }
           } catch (Exception e) {
-            Log.e("ScreenCover", "Sonos control failed");
-            h.post(
-                () ->
-                    Toast.makeText(this, "Could not control Sonos sound", Toast.LENGTH_LONG)
-                        .show());
+            audioFailure(covered ? "Could not mute Sonos." : "Could not restore Sonos sound.", e);
           }
         });
+  }
+
+  private boolean needsHdmiSettle() {
+    return mediaVolumeFlags == 0
+        || getSharedPreferences("settings", 0).getBoolean("hdmi_settle", false);
+  }
+
+  private void restoreSonos() throws Exception {
+    if (originalMute == null) return;
+    if (originalSonosVolume >= 0 && getSonosVolume() != originalSonosVolume) {
+      setSonosVolume(originalSonosVolume);
+      if (needsHdmiSettle()) SystemClock.sleep(500);
+    }
+    setMute(originalMute);
+    // A later Android recovery can affect the speaker through HDMI. Keep its snapshot until both
+    // outputs have finished restoring, so a reconnect can apply the speaker state last again.
+    if (mediaMute.pending()) return;
+    if (!getSharedPreferences("recovery", 0).edit().clear().commit()) {
+      throw new IOException("Could not clear Sonos recovery state");
+    }
+    originalMute = null;
+    originalSonosVolume = -1;
+    Log.i("ScreenCover", "Sonos mute state restored and verified");
+  }
+
+  private void checkSonosMute(long generation, long delay) {
+    h.postDelayed(
+        () -> {
+          if (generation != audioGeneration) return;
+          mediaAudio.execute(
+              () -> {
+                if (generation != audioGeneration || originalMute == null) return;
+                try {
+                  if (!getMute() && generation == audioGeneration) {
+                    getSharedPreferences("settings", 0)
+                        .edit()
+                        .putBoolean("hdmi_settle", true)
+                        .apply();
+                    setMute(true);
+                    Log.i("ScreenCover", "HDMI overrode mute; enabled settling fallback");
+                  }
+                } catch (Exception e) {
+                  audioFailure("Could not verify Sonos mute.", e);
+                }
+              });
+        },
+        delay);
+  }
+
+  private void audioFailure(String message, Exception error) {
+    Log.e("ScreenCover", message, error);
+    h.post(() -> toast(message));
   }
 
   private final Handler h = new Handler(Looper.getMainLooper());
@@ -152,7 +265,18 @@ public class CoverService extends AccessibilityService {
   private String pendingPackage;
   private final Runnable confirmPackage =
       () -> {
-        if (appPolicy.observe(pendingPackage, true, getPackageName()) && cover != null) hide();
+        String pkg = pendingPackage;
+        pendingPackage = null;
+        if (!appPolicy.observe(pkg, true, getPackageName())) return;
+        getSharedPreferences("app_detection", 0)
+            .edit()
+            .putString("package", pkg)
+            .putInt(
+                "boot",
+                android.provider.Settings.Global.getInt(
+                    getContentResolver(), android.provider.Settings.Global.BOOT_COUNT, -1))
+            .apply();
+        if (cover != null) hide();
       };
 
   public String detectedApp() {
@@ -160,7 +284,11 @@ public class CoverService extends AccessibilityService {
   }
 
   public String selectedPreset() {
-    if (presets.automatic()) return presets.automaticProfile(detectedProfile());
+    if (presets.automatic()) {
+      // An override for unknown apps cannot identify an app after a fresh service connection.
+      if (appPolicy.currentApp().isEmpty()) return AppPresetPolicy.FULL_DIM;
+      return presets.automaticProfile(detectedProfile());
+    }
     return appPolicy.select(false, presets.manual(), presets.apps());
   }
 
@@ -289,10 +417,19 @@ public class CoverService extends AccessibilityService {
   protected void onServiceConnected() {
     instance = this;
     presets = new PresetStore(this);
+    android.content.SharedPreferences detection = getSharedPreferences("app_detection", 0);
+    int boot =
+        android.provider.Settings.Global.getInt(
+            getContentResolver(), android.provider.Settings.Global.BOOT_COUNT, -1);
+    String lastPackage = detection.getString("package", "");
+    if (boot >= 0 && detection.getInt("boot", -1) == boot && confirmedApp(lastPackage)) {
+      appPolicy.observe(lastPackage, true, getPackageName());
+    }
     shortcutStore = new ShortcutStore(this);
     loadShortcut();
     audio = (AudioManager) getSystemService(AUDIO_SERVICE);
     android.content.SharedPreferences recovery = getSharedPreferences("android_audio_recovery", 0);
+    mediaVolumeFlags = recovery.getInt("flags", 0);
     mediaMute =
         new MediaMute(
             new MediaMute.Audio() {
@@ -308,7 +445,7 @@ public class CoverService extends AccessibilityService {
                 if (audio.isVolumeFixed()) {
                   throw new UnsupportedOperationException("This output has fixed volume");
                 }
-                audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, mediaVolumeFlags);
                 long deadline = SystemClock.elapsedRealtime() + 1000;
                 while (audio.getStreamVolume(AudioManager.STREAM_MUSIC) != volume
                     && SystemClock.elapsedRealtime() < deadline) {
@@ -347,6 +484,7 @@ public class CoverService extends AccessibilityService {
                     .edit()
                     .putBoolean("restore", pending)
                     .putInt("volume", volume)
+                    .putInt("flags", mediaVolumeFlags)
                     .commit()) {
                   throw new IllegalStateException("Could not save Android audio recovery state");
                 }
@@ -356,6 +494,9 @@ public class CoverService extends AccessibilityService {
     Log.i("ScreenCover", "connected");
     if (getSharedPreferences("recovery", 0).getBoolean("restore", false)) {
       originalMute = getSharedPreferences("recovery", 0).getBoolean("mute", false);
+      originalSonosVolume = getSharedPreferences("recovery", 0).getInt("volume", -1);
+      if (!mediaMute.pending())
+        mediaVolumeFlags = getSharedPreferences("recovery", 0).getInt("flags", 0);
       audioHost = getSharedPreferences("recovery", 0).getString("host", "");
     }
     // Recover each output independently, even if the sound settings have changed.
@@ -447,6 +588,14 @@ public class CoverService extends AccessibilityService {
   }
 
   private void show() {
+    // A shortcut can arrive before the app-event debounce expires.
+    if (pendingPackage != null) {
+      h.removeCallbacks(confirmPackage);
+      confirmPackage.run();
+    }
+    if (presets.automatic() && appPolicy.currentApp().isEmpty()) {
+      toast("App not detected yet. Go Home, then reopen your streaming app to select its mask.");
+    }
     // Keep the chosen layout until a remote arrow switches it or the cover closes.
     coverDetectedProfile = detectedProfile();
     coverProfile = selectedPreset();
