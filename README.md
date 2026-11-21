@@ -2,13 +2,13 @@
 
 **Make streaming ads less distracting with a shortcut on your Android TV remote.**
 
-Press your shortcut to darken the screen while keeping the ad countdown visible. Press it again when you’re ready to return.
+Press your shortcut to mute the sound and darken the screen while keeping the ad countdown visible. Press it again when you’re ready to restore the picture and sound.
 
 Includes ready-to-use masks for Prime Video and HBO Max, with adjustable layouts for other streaming apps.
 
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes.
 
-**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.4.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
+**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.5.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
 ![Before and after an illustrative 95% ad dimmer, with the countdown visible](docs/ad-dimmer-demo.png)
 
@@ -31,8 +31,8 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 
 | Remote button | What happens |
 | --- | --- |
-| Your confirmed shortcut | Dim / restore the picture |
-| Back while dimmed | Restore the picture |
+| Your confirmed shortcut | Mute and dim / restore picture and sound |
+| Back while dimmed | Restore picture and sound |
 | Left or Right while dimmed | Switch the timer preset |
 | Volume Up while dimmed | Restore the picture and raise volume |
 | Tap or hold Volume Down (default) | Normal immediate volume control |
@@ -44,15 +44,14 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 - Change the darkness; the default is **95%**.
 - Move or resize the timer opening—or hide it entirely.
 - **Automatic app-aware masks** — Detects whether you're using HBO Max or Prime Video and automatically selects the correct mask, keeping the ad countdown visible while dimming the rest of the screen. You can also save a layout for each app or choose a mask manually.
-- Optionally connect **Sonos** to mute and restore sound too. Other audio outputs are not currently controlled.
+- **Android TV audio** — Silences media audio while dimmed and restores the previous volume when you return.
+- Optionally use direct **Sonos** control for a connected speaker.
 
 ## Before you install
 
-**Source preview:** The next release adds Android TV media muting and restoration with the dimming shortcut. Local tests pass; device and audio-output verification is pending. The linked v0.4.0 download currently supports Sonos audio control.
-
 **You trigger it yourself.** Ad Dimmer does not detect or skip ads. Playback is intended to continue underneath; press the shortcut again when the ad ends.
 
-This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Optional audio was tested with a Sonos Arc Ultra.
+This is an **experimental release** for Android TV. The bundled timer openings were calibrated on an Android 11 XGIMI Halo+ with Prime Video and HBO Max. Other layouts may need adjustments in **Advanced**. Android media audio was verified with the projector’s built-in speakers. Audio control varies by device and output; fixed-volume and external audio routes may need separate control. Direct Sonos control was tested with a Sonos Arc Ultra.
 
 **Privacy by design** — Uses only the active app's identity to select the appropriate mask, without accessing viewing content. It does not send viewing history anywhere. Accessibility also handles remote buttons. Optional Sonos control stays on your home network. [Privacy](PRIVACY.md) · [Known limits and testing](docs/VERIFICATION.md)
 

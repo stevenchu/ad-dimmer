@@ -80,29 +80,36 @@ public class CoverService extends AccessibilityService {
     if (getMute() != value) throw new IOException("Sonos mute did not match");
   }
 
+  // Serialize Android audio work across service reconnections and keep it off the UI thread.
+  private static final ExecutorService mediaAudio = Executors.newSingleThreadExecutor();
+
   private void sound(boolean covered) {
-    try {
-      if (covered) {
-        if (!getSharedPreferences("settings", 0).getBoolean("sonos", false)) mediaMute.mute();
-      } else {
-        mediaMute.restore();
-      }
-    } catch (RuntimeException e) {
-      Log.e("ScreenCover", "Android audio control failed", e);
-      toast(
-          covered
-              ? "Could not mute Android TV audio. Check your audio output or use Sonos control."
-              : "Could not restore Android TV audio. Use your remote to unmute.");
-    }
-    sonosSound(covered);
+    boolean useAndroid = !getSharedPreferences("settings", 0).getBoolean("sonos", false);
+    mediaAudio.execute(
+        () -> {
+          try {
+            if (covered && useAndroid) mediaMute.mute();
+            else mediaMute.restore();
+          } catch (RuntimeException e) {
+            Log.e("ScreenCover", "Android audio control failed", e);
+            h.post(
+                () ->
+                    toast(
+                        covered
+                            ? "Could not mute Android TV audio. Check your audio output or use"
+                                + " Sonos control."
+                            : "Could not restore Android TV audio. Use your remote to unmute."));
+          }
+        });
+    sonosSound(covered, !useAndroid);
   }
 
-  private void sonosSound(boolean covered) {
+  private void sonosSound(boolean covered, boolean useSonos) {
     network.execute(
         () -> {
           try {
             if (covered) {
-              if (!getSharedPreferences("settings", 0).getBoolean("sonos", false)) return;
+              if (!useSonos) return;
               if (originalMute == null) {
                 audioHost = getSharedPreferences("settings", 0).getString("host", "");
                 if (!Config.validHost(audioHost))
@@ -176,7 +183,7 @@ public class CoverService extends AccessibilityService {
   private long trialEnds;
   private boolean trialTriggered = false, recording = false;
   private int recorded = -1;
-  private boolean backUp = false;
+  private boolean backUp = false, volumeUp = false;
   private final Runnable holdCheck =
       () -> {
         if (gesture != null && gesture.tick(SystemClock.uptimeMillis())) fireShortcut();
@@ -293,6 +300,22 @@ public class CoverService extends AccessibilityService {
                 return audio.isStreamMute(AudioManager.STREAM_MUSIC);
               }
 
+              public int volume() {
+                return audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+              }
+
+              public void setVolume(int volume) {
+                if (audio.isVolumeFixed()) {
+                  throw new UnsupportedOperationException("This output has fixed volume");
+                }
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+                long deadline = SystemClock.elapsedRealtime() + 1000;
+                while (audio.getStreamVolume(AudioManager.STREAM_MUSIC) != volume
+                    && SystemClock.elapsedRealtime() < deadline) {
+                  SystemClock.sleep(25);
+                }
+              }
+
               public void setMuted(boolean muted) {
                 if (audio.isVolumeFixed()) {
                   throw new UnsupportedOperationException("This output has fixed volume");
@@ -301,6 +324,13 @@ public class CoverService extends AccessibilityService {
                     AudioManager.STREAM_MUSIC,
                     muted ? AudioManager.ADJUST_MUTE : AudioManager.ADJUST_UNMUTE,
                     0);
+                // AudioService can apply the change asynchronously. Verification runs on our
+                // worker.
+                long deadline = SystemClock.elapsedRealtime() + 1000;
+                while (audio.isStreamMute(AudioManager.STREAM_MUSIC) != muted
+                    && SystemClock.elapsedRealtime() < deadline) {
+                  SystemClock.sleep(25);
+                }
               }
             },
             new MediaMute.Recovery() {
@@ -308,8 +338,16 @@ public class CoverService extends AccessibilityService {
                 return recovery.getBoolean("restore", false);
               }
 
-              public void save(boolean pending) {
-                if (!recovery.edit().putBoolean("restore", pending).commit()) {
+              public int savedVolume() {
+                return recovery.getInt("volume", -1);
+              }
+
+              public void save(boolean pending, int volume) {
+                if (!recovery
+                    .edit()
+                    .putBoolean("restore", pending)
+                    .putInt("volume", volume)
+                    .commit()) {
                   throw new IllegalStateException("Could not save Android audio recovery state");
                 }
               }
@@ -338,7 +376,19 @@ public class CoverService extends AccessibilityService {
       } else backUp = false;
       return true;
     }
-    if (key == KeyEvent.KEYCODE_VOLUME_UP && down && cover != null) hide();
+    if (key == KeyEvent.KEYCODE_VOLUME_UP && (cover != null || volumeUp)) {
+      if (down) {
+        hide();
+        volumeUp = true;
+        mediaAudio.execute(
+            () ->
+                audio.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE,
+                    AudioManager.FLAG_SHOW_UI));
+      } else volumeUp = false;
+      return true;
+    }
     if (key == KeyEvent.KEYCODE_DPAD_LEFT || key == KeyEvent.KEYCODE_DPAD_RIGHT) {
       // Consume the matching release even if another action has already removed the cover.
       if (!down && profileKeysDown.remove(key)) return true;

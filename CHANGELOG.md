@@ -1,10 +1,11 @@
 # Changelog
 
-## 0.5.0 preview — unreleased
+## 0.5.0 — 2026-11-20
 
-- Added Android TV media muting when the cover appears, with restoration on uncover, service interruption, and service reconnection. Already-muted audio stays muted. The pending restoration is saved before muting and retained for retry after a failed restore.
-- Existing Sonos configurations continue to use direct Sonos control. Android audio failures show a message while the picture cover remains usable.
-- Local recovery tests and APK build pass. Device and audio-output verification is pending. The public download remains v0.4.0.
+- Added Android TV media muting by saving the current media volume and setting it to zero while the cover is active. Uncovering restores the saved level. Already-muted or zero-volume audio stays silent, and a nonzero volume changed by the user is preserved.
+- Audio work runs in sequence off the UI thread. Pending restoration is saved before muting and retried after a failed restore or service restart. Earlier mute-only preview journals remain supported.
+- Volume Up restores sound before raising it. Existing Sonos configurations continue to use direct Sonos control.
+- Verified audible mute and restoration on the Android 11 Halo+ built-in speakers with the physical double-press Menu shortcut and Volume Up. On-device checks also cover repeated cycles, already-muted state, service interruption, and process-death recovery. Bluetooth and the final volume-zero approach on HDMI ARC remain unverified.
 
 ## 0.4.0 — 2026-11-17
 

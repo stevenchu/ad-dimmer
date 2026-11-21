@@ -10,13 +10,13 @@ If your TV cannot open APK files, use the computer method below. A Google Play a
 
 ## Choose your settings
 
-The public v0.4.0 download uses optional Sonos audio control. The unreleased v0.5.0 source preview mutes Android TV media audio by default and restores the previous mute state when uncovered. With Sonos enabled it uses direct Sonos control instead. Fixed-volume and some external audio outputs can prevent Android media muting. Live device verification of this preview is pending.
+From v0.5.0, Ad Dimmer silences Android TV media audio by default and restores the previous volume when uncovered. Already-muted audio stays muted. With Sonos enabled it uses direct Sonos control instead. Built-in speakers were verified on the Halo+; fixed-volume and some external audio outputs may need separate control.
 
 Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the D-pad and OK button.
 
 - **Shortcut:** choose and test your remote button.
 - **Picture:** choose a preset, darkness, and whether to keep the ad timer visible. Choose **Save picture**.
-- **Sound:** optionally enable Sonos mute and enter your speaker address. Choose **Save sound**.
+- **Sound:** Android TV media control works by default. For direct Sonos control, enable Sonos mute and enter your speaker address. Choose **Save sound**.
 - **Advanced:** move or resize the timer opening, or add an app preset. Positions use a 1920 × 1080 reference and scale with your display.
 
 Visual settings belong to each preset; sound settings apply to all presets. Automatic selection uses the detected app's saved preset, or Default. Other streaming apps still need testing.
@@ -35,7 +35,7 @@ After enabling the service, open **Ad Dimmer → Shortcut → Change shortcut**.
 
 1. Play something at a comfortable volume.
 2. Use your chosen shortcut. The picture should dim.
-3. If Sonos is enabled, confirm sound stops.
+3. Confirm sound actually stops. Check the speakers as well as Android’s volume indicator.
 4. Press Back. Picture and prior sound state should return, without navigating away from the video.
 5. Repeat using your shortcut to uncover. Test a single Volume Down tap, a hold, and Volume Up.
 6. During an actual ad, fit the timer opening. If it misses the timer, uncover and adjust settings.
@@ -62,13 +62,13 @@ Replace `YOUR_DEVICE` with the exact authorized entry shown by `adb devices`. Fo
 
 Uncover first, then disable **Ad Dimmer remote shortcut** in Accessibility. Uninstall Ad Dimmer from Apps if you want to remove it. You can then re-enable your old button remapper.
 
-If sound stays muted, unmute directly in the Sonos app. Reconnecting Ad Dimmer's service also attempts to restore a saved mute state. Do not reset the projector or flash firmware to remove this app.
+If sound stays silent, raise the volume with your TV remote, or unmute directly in the Sonos app when using Sonos control. Reconnecting Ad Dimmer’s service also attempts to restore saved audio state. Do not reset the projector or flash firmware to remove this app.
 
 ## Problems
 
 - **Double-tap does nothing:** check Accessibility is still enabled and another key-filtering service is not competing.
 - **Ordinary button actions also happen:** double-press and hold observe the button without delaying its normal action. Try another button if this interferes.
-- **Sound does not mute:** check Sonos is enabled, the correct soundbar address is saved, and both devices can reach each other. Wi-Fi guest isolation can block local control.
-- **Picture returns but no sound:** use Sonos to unmute; report the sequence and any error message.
+- **Sound does not mute:** Android audio control depends on the output route. For a connected Sonos speaker, try direct Sonos control and check its saved address. Wi-Fi guest isolation can block that local control. Report the device, output route, and whether sound remains audible.
+- **Picture returns but no sound:** raise the TV volume, or use Sonos to unmute when direct Sonos control is enabled. Report the sequence and any error message.
 - **Timer opening is wrong:** adjust its geometry; the app does not recognize the timer automatically.
 - **Video pauses:** report your device, Android version, and video app. Keeping playback active is not universal.

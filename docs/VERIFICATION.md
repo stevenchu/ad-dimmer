@@ -1,12 +1,16 @@
 # What has been verified
 
-## v0.5.0 source preview — Android media muting
+## v0.5.0 — Android media muting
 
-- Local tests cover unmuted and already-muted starting states, repeated cleanup, user unmute, service recreation, failed persistence, ignored/failed audio requests, restoration failures, and recovery retries. Existing configuration, presets, and shortcut tests pass.
-- APK compilation and signature verification pass using a development signing key.
-- The previously used Halo+ address timed out on 2026-11-20. No installation or live audio/physical-remote checks were completed for this change.
-- Pending device checks include audible mute and restoration using the physical shortcut, Back, Volume Up, app changes, service disable/re-enable, initially muted playback, and separate speaker/Bluetooth/external-output routes. Android-reported mute state alone cannot confirm that an external speaker is silent.
-- The public download remains v0.4.0 until a new release is published.
+Verified on 2026-11-20 with the Android 11 XGIMI Halo+ using built-in speakers and direct Sonos control disabled. The personal package was updated in place with its existing signing key; its saved double-press Menu shortcut and picture settings were retained.
+
+- The earlier mute-flag-only implementation changed Android's reported mute state while playback remained audible. On HDMI ARC, the system also issued an unmute shortly after the request. The final implementation saves the media volume and sets it to zero instead.
+- The owner confirmed that setting the media volume to zero actually silences the built-in speakers. With the final implementation installed, the owner confirmed physical double-press Menu dims and silences, a second double-press restores both, and Volume Up exits the cover and restores/increases sound.
+- A shell-only diagnostic receiver exercised the same cover methods for three sustained cover/uncover cycles, each retaining the saved volume of 33. It also checked preservation of an Android-reported already-muted state, service interruption, and actual process death while covered. The reconnected Accessibility service restored volume 33 and cleared the pending journal.
+- The diagnostic receiver is confined to the temporary test build and is removed from the final personal installation. The public APK contains the normal app components.
+- Local tests cover saved-volume restoration, already-muted and zero-volume starts, user volume changes, service recreation, failed persistence, ignored/failed audio requests, restoration failures, recovery retries, and older mute-only journals. Existing configuration, presets, and shortcut tests pass.
+- The public APK builds and verifies against the existing community release signing certificate.
+- The final volume-zero implementation has not been tested on Bluetooth or HDMI ARC. Sound control across all Android TV hardware and output routes remains unverified. The earlier Sonos direct-control results below apply to that separate output mode.
 
 ## v0.4.0 preview — mask profiles
 

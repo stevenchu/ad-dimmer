@@ -3,11 +3,29 @@ import org.stevenchu.screencover.MediaMute;
 public final class MediaMuteTest {
   private static final class Fixture implements MediaMute.Audio, MediaMute.Recovery {
     boolean muted, pending, ignoreChange, failChange, failSave;
-    int changes;
+    int changes, volume = 33, savedVolume = -1;
     MediaMute session = new MediaMute(this, this);
 
     public boolean isMuted() {
       return muted;
+    }
+
+    public int volume() {
+      return muted ? 0 : volume;
+    }
+
+    public int savedVolume() {
+      return savedVolume;
+    }
+
+    public void setVolume(int value) {
+      if (!pending) throw new AssertionError("Audio changed before recovery was saved");
+      changes++;
+      if (failChange) throw new IllegalStateException("Audio unavailable");
+      if (!ignoreChange) {
+        volume = value;
+        muted = value == 0;
+      }
     }
 
     public boolean pending() {
@@ -21,9 +39,10 @@ public final class MediaMuteTest {
       if (!ignoreChange) muted = value;
     }
 
-    public void save(boolean value) {
+    public void save(boolean value, int originalVolume) {
       if (failSave) throw new IllegalStateException("Storage unavailable");
       pending = value;
+      savedVolume = originalVolume;
     }
   }
 
@@ -43,9 +62,11 @@ public final class MediaMuteTest {
   public static void main(String[] args) {
     Fixture f = new Fixture();
     f.session.mute();
-    check(f.muted && f.pending, "Cover mutes and records recovery");
+    check(
+        f.muted && f.pending && f.volume == 0 && f.savedVolume == 33,
+        "Cover zeros volume and records recovery");
     f.session.restore();
-    check(!f.muted && !f.pending, "Uncover restores and clears recovery");
+    check(!f.muted && !f.pending && f.volume == 33, "Uncover restores volume and clears recovery");
     f.session.restore();
     check(f.changes == 2, "Repeated lifecycle cleanup leaves audio alone");
 
@@ -64,8 +85,10 @@ public final class MediaMuteTest {
     f = new Fixture();
     f.session.mute();
     f.muted = false;
+    f.volume = 20;
     f.session.restore();
-    check(f.changes == 1 && !f.pending, "User unmute is preserved during cleanup");
+    check(
+        f.changes == 1 && !f.pending && f.volume == 20, "User unmute is preserved during cleanup");
 
     f = new Fixture();
     f.failSave = true;
@@ -105,6 +128,18 @@ public final class MediaMuteTest {
     f.failSave = false;
     f.session.restore();
     check(!f.pending && !f.muted, "Cleanup retry preserves restored audio");
+    f = new Fixture();
+    f.volume = 0;
+    f.session.mute();
+    f.session.restore();
+    check(f.volume == 0 && f.changes == 0 && !f.pending, "Silent starting volume stays silent");
+
+    f = new Fixture();
+    f.pending = true;
+    f.muted = true;
+    f.session.restore();
+    check(!f.muted && !f.pending && f.volume == 33, "Legacy mute-only journal recovers");
+
     System.out.println("MediaMute tests passed");
   }
 }
