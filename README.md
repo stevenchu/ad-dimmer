@@ -2,9 +2,11 @@
 
 **Make streaming ads less distracting with a shortcut on your Android TV remote.**
 
-Choose a remote shortcut to darken the picture. Keep the ad countdown visible, then use the shortcut again—or press **Back**—to return.
+Press your shortcut to darken the screen while keeping the ad countdown visible. Press it again when you’re ready to return.
 
-Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes. **Tested with Prime Video and HBO Max on an Android 11 XGIMI Halo+.**
+Includes ready-to-use masks for Prime Video and HBO Max, with adjustable layouts for other streaming apps. Optional Sonos support mutes and restores sound too.
+
+Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes.
 
 **[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.4.0/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
