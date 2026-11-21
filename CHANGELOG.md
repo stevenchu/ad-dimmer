@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.2 — 2026-11-21
+
+- In automatic mode, Left/Right mask changes now last until you uncover. The next activation returns to the detected app’s own preset. Existing saved automatic overrides are ignored, including old HBO-to-Full-dimming choices.
+- Manual mode continues to remember its selected preset. Per-app layout edits are preserved.
+- Temporary mask changes and manual mode are identified in the cover label. Picture settings explain the selection lifetime.
+- On-device checks cover legacy override data, temporary Full dimming followed by automatic HBO selection, and persistent manual selection.
+
 ## 0.5.1 — 2026-11-21
 
 - Android media control now runs on every cover, with connected Sonos control attempted as well. A Sonos setup failure allows the Android attempt to continue.

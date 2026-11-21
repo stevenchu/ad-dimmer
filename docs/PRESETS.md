@@ -8,7 +8,7 @@ Open Ad Dimmer from Android TV's Apps list. Choose a preset in **Picture** to ad
 
 The bundled presets are Prime Video (upper right), HBO Max (upper left), and Full dimming (no opening). The HBO Max opening covers the Ad badge and countdown in the reference photo. Its alignment during playback may need adjustment. Audio settings are global.
 
-With the cover on, press **Left** or **Right** to cycle through presets. The cover stays in place and shows the selected preset name. With automatic selection on, Ad Dimmer remembers your choice for the detected app profile. Apps without a configured profile share the Full dimming fallback. Cycling back to the automatic preset clears the override. With automatic selection off, your last manual choice applies across apps.
+With the cover on, press **Left** or **Right** to cycle through presets. The cover stays in place and shows the selected preset name. With automatic selection on, Left/Right changes last until you uncover. The next activation chooses the detected app’s own preset again. Older saved automatic overrides are ignored. Apps without a configured profile use Full dimming. With automatic selection off, your last manual choice is remembered across activations and apps.
 
 To add another app, use **Add an app preset (advanced)** with its Android package ID and a name. The new preset copies Default and starts unverified. Save edits before selecting a different profile. A name or saved profile is not evidence of playback compatibility.
 
@@ -16,12 +16,12 @@ To add another app, use **Add an app preset (advanced)** with its Android packag
 
 - **AppPresetPolicy.java**: pure selection rules. Tracks a current app in memory, rejects our own package and common system/keyboard events, selects automatic/manual/default. Unit tests live in `AppPresetPolicyTest.java`.
 - **CoverService.java**: consumes only `TYPE_WINDOW_STATE_CHANGED` package identifiers. Accepts saved identities, launchable TV/mobile apps, and TV Settings. Short debounce coalesces transitions. No text or screen-node reads. Identity inferred from these events is best-effort, not an authoritative foreground-task API.
-- **PresetStore.java**: schema version 6 updates the original HBO Max preview layout while preserving custom positions. It saves the automatic/manual choice, manual preset, and overrides by configured profile.
+- **PresetStore.java**: schema version 6 updates the original HBO Max preview layout while preserving custom positions. It saves the automatic/manual choice and manual preset. Per-app visual edits persist; temporary automatic-mode switching stays in the active cover only.
 - **MainActivity.java**: remote-accessible preset editor and validation. It keeps audio settings global.
 
 While covered, only an explicit Left/Right press changes the layout. A confirmed change to a different launchable app removes the cover and requests restoration of the saved audio state.
 
-At service startup, app identity is unknown until a qualifying window event arrives. Full dimming or its saved override applies in the meantime. Manual selection is available when firmware emits unreliable events.
+At service startup, the latest confirmed app identity is restored for the same device boot when available. A qualifying window event refreshes it. If identity is unavailable, Full dimming applies and the app explains how to reopen the streaming app. Manual selection is available when firmware emits unreliable events.
 
 ## Adding a supported app
 
@@ -31,7 +31,7 @@ At service startup, app identity is unknown until a qualifying window event arri
 4. Submit reference geometry (1920 × 1080 coordinates), versions, and results in an issue or PR. Do not label a simulated event as a tested streaming service.
 5. If proposing a bundled identity or layout, add focused policy tests and document the scope of actual testing. Keep a Default fallback.
 
-Only configured preset identities are saved. The current app is held in memory; no app-use history is recorded or uploaded. Key mapping, ad detection, and speaker discovery are separate extension areas.
+Configured preset identities, the latest confirmed app identity, and its boot identifier are saved locally. No app-use history is recorded or uploaded. Key mapping, ad detection, and speaker discovery are separate extension areas.
 
 ### Prime Video starting layout
 

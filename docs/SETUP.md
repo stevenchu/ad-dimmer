@@ -19,7 +19,7 @@ Open Ad Dimmer from the TV's Apps list. Move between fields and buttons with the
 - **Sound:** Android TV media control works by default. Enter your Sonos speaker address and choose **Save sound** to connect it. Clear the address and save to disconnect.
 - **Advanced:** move or resize the timer opening, or add an app preset. Positions use a 1920 × 1080 reference and scale with your display.
 
-Visual settings belong to each preset; sound settings apply to all presets. Automatic selection uses the detected app's saved preset, or Default. Other streaming apps still need testing.
+Visual settings belong to each preset; sound settings apply to all presets. From v0.5.2, Left/Right changes in automatic mode last until you uncover. The next activation returns to the detected app’s mask. Manual mode remembers your choice. Automatic selection uses the detected app's saved preset, or Default. Other streaming apps still need testing.
 
 ## Enable the service and choose a shortcut
 

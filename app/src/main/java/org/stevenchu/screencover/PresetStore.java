@@ -111,22 +111,8 @@ public final class PresetStore {
     return data.getString("manual", AppPresetPolicy.DEFAULT);
   }
 
-  public String automaticProfile(String detectedProfile) {
-    String selected = data.getString("override." + detectedProfile, detectedProfile);
-    return AppPresetPolicy.DEFAULT.equals(selected) || apps().contains(selected)
-        ? selected : detectedProfile;
-  }
-
-  public void saveSelection(String detectedProfile, String selected) {
-    SharedPreferences.Editor edit = data.edit();
-    if (automatic()) {
-      String key = "override." + detectedProfile;
-      if (selected.equals(detectedProfile)) edit.remove(key);
-      else edit.putString(key, selected);
-    } else {
-      edit.putString("manual", selected);
-    }
-    edit.apply();
+  public void saveManualSelection(String selected) {
+    data.edit().putString("manual", selected).apply();
   }
 
   public Visual read(String id) {

@@ -285,9 +285,9 @@ public class CoverService extends AccessibilityService {
 
   public String selectedPreset() {
     if (presets.automatic()) {
-      // An override for unknown apps cannot identify an app after a fresh service connection.
+      // Start with Full dimming until an app identity is known.
       if (appPolicy.currentApp().isEmpty()) return AppPresetPolicy.FULL_DIM;
-      return presets.automaticProfile(detectedProfile());
+      return detectedProfile();
     }
     return appPolicy.select(false, presets.manual(), presets.apps());
   }
@@ -583,7 +583,7 @@ public class CoverService extends AccessibilityService {
   private void switchProfile(boolean right) {
     coverProfile = AppPresetPolicy.cycle(coverProfile, right, presets.apps());
     coverVisual = presets.read(coverProfile);
-    presets.saveSelection(coverDetectedProfile, coverProfile);
+    if (!presets.automatic()) presets.saveManualSelection(coverProfile);
     cover.invalidate();
   }
 
@@ -631,8 +631,13 @@ public class CoverService extends AccessibilityService {
             paint.setColor(Color.argb(110, 220, 225, 230));
             paint.setTextSize(18 * getResources().getDisplayMetrics().density);
             paint.setTextAlign(Paint.Align.CENTER);
+            String label = presets.name(coverProfile);
+            if (!presets.automatic()) label = "Manual · " + label;
+            else if (!coverProfile.equals(coverDetectedProfile)) {
+              label = presets.name(coverDetectedProfile) + " · " + label + " (temporary)";
+            }
             c.drawText(
-                presets.name(coverProfile) + "   ·   ◀ ▶ Change preset   ·   Back to return",
+                label + "   ·   ◀ ▶ Change preset   ·   Back to return",
                 getWidth() / 2f, getHeight() - 45, paint);
           }
         };

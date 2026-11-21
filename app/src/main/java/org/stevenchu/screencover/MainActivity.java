@@ -259,7 +259,7 @@ public class MainActivity extends Activity {
     CheckBox auto = ui.check("Choose preset automatically", automatic);
     auto.setOnCheckedChangeListener((b, on) -> automatic = on);
     panel.addView(auto);
-    ui.note(panel, "While dimmed, press Left or Right to switch presets.");
+    ui.note(panel, "In automatic mode, Left/Right changes last until you uncover.");
     TextView value = ui.text("Darkness   " + draft.opacity + "%", 20, true);
     panel.addView(value);
     SeekBar slider = new SeekBar(this);

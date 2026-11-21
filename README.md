@@ -8,7 +8,7 @@ Includes ready-to-use masks for Prime Video and HBO Max, with adjustable layouts
 
 Free and open source. Made for Android TV devices, including TVs, projectors, and streaming boxes.
 
-**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.5.1/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
+**[Download Ad Dimmer](https://github.com/stevenchu/ad-dimmer/releases/download/v0.5.2/AdDimmer.apk)** · [Installation help](docs/SETUP.md) · [Report a problem](https://github.com/stevenchu/ad-dimmer/issues)
 
 ![Before and after an illustrative 95% ad dimmer, with the countdown visible](docs/ad-dimmer-demo.png)
 
@@ -33,7 +33,7 @@ Normal volume control is immediate. Single-press replacement shows a warning; Ho
 | --- | --- |
 | Your confirmed shortcut | Mute and dim / restore picture and sound |
 | Back while dimmed | Restore picture and sound |
-| Left or Right while dimmed | Switch the timer preset |
+| Left or Right while dimmed | Temporarily switch masks in automatic mode |
 | Volume Up while dimmed | Restore the picture and raise volume |
 | Tap or hold Volume Down (default) | Normal immediate volume control |
 

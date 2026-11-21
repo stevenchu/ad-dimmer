@@ -102,7 +102,7 @@ Have the user play a video and physically try the following checks.
 - Their confirmed shortcut dims the picture and removes the cover when used again.
 - Back removes the cover without leaving the video. Home remains usable.
 - Normal volume controls behave as expected.
-- Prime Video and HBO Max select their respective presets. Left and Right switch presets while dimmed.
+- Prime Video and HBO Max select their respective presets. From v0.5.2, Left and Right changes in automatic mode last for the current cover only. Uncover and activate again to confirm the app’s own mask returns. Manual mode remembers its selection.
 - During an actual ad, the timer opening fits the countdown. Adjust it in Advanced when needed.
 - On v0.5.0 and newer, covering silences Android media audio and uncovering restores the previous volume. Confirm audible silence. If Sonos is connected, check its mute and volume restoration as well. Repeat once starting already muted.
 - After restarting the TV, confirm Accessibility is still enabled and the shortcut works.

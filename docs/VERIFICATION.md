@@ -1,5 +1,14 @@
 # What has been verified
 
+## v0.5.2 — temporary automatic-mode mask changes
+
+Tested on 2026-11-21 on the Android 11 Halo+.
+
+- The reported HBO/Full-dimming failure had automatic mode enabled and a correctly detected `com.wbd.stream` identity, with a saved `override.com.wbd.stream=full-dim`. The displayed mask came from the remembered manual override.
+- Seeded that same legacy override and verified automatic selection still chose HBO Max. Switched the active cover to Full dimming, uncovered, and verified the next activation showed HBO Max again.
+- Disabled automatic mode, changed the mask, and verified the manual choice persisted across activations. Restored the owner’s automatic-mode setting afterward.
+- The specific HBO override was cleared during diagnosis. Other saved layout geometry was preserved. Existing automatic override entries are ignored by the new selection policy.
+
 ## v0.5.1 — combined Android and Sonos control
 
 Tested on 2026-11-21 with the Android 11 Halo+ and Sonos Arc Ultra over HDMI ARC.
